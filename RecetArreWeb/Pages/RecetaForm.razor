@@ -1,0 +1,689 @@
+@page "/recetas/crear"
+@page "/recetas/editar/{Id:int}"
+@attribute [Authorize]
+@inject IRecetaService recetaService
+@inject ICategoriaService categoriaService
+@inject IIngredienteService ingredienteService
+@inject NavigationManager navigation
+
+<PageTitle>@(Id == null ? "Nueva Receta" : "Editar Receta") | Mi Recetario</PageTitle>
+
+<style>
+  /* import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');*/
+
+    /* ─── Cottagecore Variables ─── */
+    :root {
+        --cc-parchment:   #f5f0e8;
+        --cc-cream:       #faf6ee;
+        --cc-linen:       #ede6d6;
+        --cc-bark:        #7a5c3a;
+        --cc-bark-light:  #a07850;
+        --cc-moss:        #5a7a4a;
+        --cc-sage:        #8aab7a;
+        --cc-sage-pale:   #c8ddb8;
+        --cc-lavender:    #b8a8c8;
+        --cc-rose:        #d4836a;
+        --cc-rose-pale:   #e8c4b0;
+        --cc-terracotta:  #c0664a;
+        --cc-ink:         #3a2e22;
+        --cc-muted:       #8a7a68;
+        --cc-border:      #c8b898;
+        --cc-shadow:      rgba(90, 60, 30, 0.12);
+    }
+
+    /* ─── Base ─── */
+    .cc-page {
+        background-color: var(--cc-parchment);
+        background-image:
+            url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8b898' fill-opacity='0.18'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        min-height: 100vh;
+        padding-bottom: 3rem;
+        font-family: 'Lora', Georgia, serif;
+        color: var(--cc-ink);
+    }
+
+    /* ─── Hero banner ─── */
+    .cc-hero {
+        background-color: #3a2e22;
+        background-image:
+            url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c8b898' fill-opacity='0.08'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+        border-radius: 0 0 24px 24px;
+        padding: 2.2rem 0 2rem;
+        margin-bottom: 2rem;
+        color: var(--cc-parchment);
+        position: relative;
+        overflow: hidden;
+    }
+    .cc-hero::after {
+        content: '🌿';
+        position: absolute;
+        right: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 5rem;
+        opacity: 0.12;
+        pointer-events: none;
+    }
+
+    .cc-hero-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 600;
+        font-style: italic;
+        color: var(--cc-rose-pale);
+        margin-bottom: 4px;
+    }
+    .cc-hero-sub {
+        font-size: 0.9rem;
+        color: rgba(245, 240, 232, 0.65);
+        font-style: italic;
+    }
+
+    .cc-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: rgba(245,240,232,0.75);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-family: 'Lora', serif;
+        margin-bottom: 12px;
+        transition: color 0.2s, transform 0.2s;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+    .cc-back-btn:hover {
+        color: var(--cc-rose-pale);
+        transform: translateX(-3px);
+    }
+
+    /* ─── Cards ─── */
+    .cc-card {
+        background-color: var(--cc-cream);
+        border: 1.5px solid var(--cc-border);
+        border-radius: 14px;
+        box-shadow: 0 3px 14px var(--cc-shadow);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+    }
+    .cc-card:hover {
+        box-shadow: 0 6px 22px var(--cc-shadow);
+    }
+
+    .cc-card-header {
+        background-color: var(--cc-linen);
+        border-bottom: 1px solid var(--cc-border);
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .cc-card-header-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.05rem;
+        font-style: italic;
+        color: var(--cc-bark);
+        margin: 0;
+    }
+    .cc-card-header-icon {
+        font-size: 1.1rem;
+    }
+    .cc-card-body {
+        padding: 22px;
+    }
+
+    /* ─── Form elements ─── */
+    .cc-label {
+        font-family: 'Lora', serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--cc-bark);
+        margin-bottom: 6px;
+        display: block;
+    }
+    .cc-label .required { color: var(--cc-rose); }
+
+    .cc-input {
+        background-color: var(--cc-parchment);
+        border: 1.5px solid var(--cc-border);
+        border-radius: 10px;
+        padding: 9px 14px;
+        color: var(--cc-ink);
+        font-family: 'Lora', serif;
+        font-size: 0.9rem;
+        width: 100%;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .cc-input:focus {
+        outline: none;
+        background-color: var(--cc-cream);
+        border-color: var(--cc-sage);
+        box-shadow: 0 0 0 3px rgba(138, 171, 122, 0.2);
+        color: var(--cc-ink);
+    }
+    .cc-input::placeholder {
+        color: var(--cc-muted);
+        font-style: italic;
+    }
+    textarea.cc-input {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+    .validation-message {
+        color: var(--cc-terracotta);
+        font-size: 0.8rem;
+        font-style: italic;
+        margin-top: 4px;
+        font-family: 'Lora', serif;
+    }
+
+    /* ─── Chip checkboxes ─── */
+    .cc-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .cc-chip {
+        position: relative;
+    }
+    .cc-chip input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .cc-chip label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        background: var(--cc-parchment);
+        border: 1.5px solid var(--cc-border);
+        border-radius: 30px;
+        cursor: pointer;
+        font-family: 'Lora', serif;
+        font-size: 0.85rem;
+        color: var(--cc-muted);
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+    .cc-chip label::before {
+        content: '○';
+        font-size: 0.75rem;
+        transition: all 0.2s ease;
+    }
+    .cc-chip input[type="checkbox"]:checked + label {
+        background: var(--cc-sage-pale);
+        border-color: var(--cc-sage);
+        color: var(--cc-moss);
+        font-weight: 500;
+    }
+    .cc-chip input[type="checkbox"]:checked + label::before {
+        content: '✿';
+        color: var(--cc-moss);
+    }
+
+    /* ─── Switch ─── */
+    .cc-switch-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+    }
+    .cc-switch-wrap .form-check-input {
+        width: 2.4rem;
+        height: 1.2rem;
+        background-color: #d4c8b4;
+        border-color: var(--cc-border);
+        border-radius: 2rem;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        margin: 0;
+    }
+    .cc-switch-wrap .form-check-input:checked {
+        background-color: var(--cc-moss);
+        border-color: var(--cc-moss);
+    }
+    .cc-switch-wrap .form-check-input:focus {
+        box-shadow: 0 0 0 3px rgba(90,122,74,0.2);
+    }
+    .cc-switch-label {
+        font-family: 'Lora', serif;
+        font-size: 0.9rem;
+        color: var(--cc-bark);
+        font-weight: 500;
+        cursor: pointer;
+        margin: 0;
+    }
+    .cc-switch-hint {
+        font-size: 0.78rem;
+        color: var(--cc-muted);
+        font-style: italic;
+        font-family: 'Lora', serif;
+        margin-top: 2px;
+    }
+
+    /* ─── Buttons ─── */
+    .btn-cc-save {
+        background-color: var(--cc-moss);
+        color: var(--cc-cream);
+        border: none;
+        border-radius: 30px;
+        padding: 10px 24px;
+        font-family: 'Lora', serif;
+        font-size: 0.92rem;
+        font-weight: 500;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        box-shadow: 0 3px 10px rgba(90,122,74,0.28);
+        cursor: pointer;
+    }
+    .btn-cc-save:hover:not(:disabled) {
+        background-color: var(--cc-bark);
+        transform: translateY(-1px);
+        box-shadow: 0 5px 16px rgba(90,60,30,0.25);
+    }
+    .btn-cc-save:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+    .btn-cc-cancel {
+        background: transparent;
+        border: 1.5px solid var(--cc-border);
+        color: var(--cc-muted);
+        border-radius: 30px;
+        padding: 9px 24px;
+        font-family: 'Lora', serif;
+        font-size: 0.88rem;
+        width: 100%;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .btn-cc-cancel:hover {
+        border-color: var(--cc-bark-light);
+        color: var(--cc-bark);
+        background: var(--cc-linen);
+    }
+
+    /* ─── Alert ─── */
+    .cc-alert-error {
+        background-color: #f9ece7;
+        color: #7a3822;
+        border: 1.5px solid var(--cc-rose);
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-family: 'Lora', serif;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .btn-close-cc {
+        filter: sepia(1) saturate(2) hue-rotate(10deg) brightness(0.6);
+        opacity: 0.6;
+    }
+    .btn-close-cc:hover { opacity: 1; }
+
+    /* ─── Loading ─── */
+    .cc-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        background: var(--cc-cream);
+        border-radius: 14px;
+        border: 1.5px solid var(--cc-border);
+        color: var(--cc-muted);
+        font-family: 'Lora', serif;
+        font-style: italic;
+    }
+    .cc-spinner {
+        color: var(--cc-moss);
+    }
+
+    /* ─── Divider ─── */
+    .cc-section-divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--cc-border);
+        margin: 6px 0 18px;
+        font-size: 0.9rem;
+    }
+    .cc-section-divider::before, .cc-section-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--cc-border), transparent);
+    }
+
+    /* ─── Number inputs ─── */
+    input[type="number"].cc-input {
+        -moz-appearance: textfield;
+    }
+    input[type="number"].cc-input::-webkit-inner-spin-button,
+    input[type="number"].cc-input::-webkit-outer-spin-button {
+        opacity: 0.4;
+    }
+</style>
+
+<div class="cc-page">
+
+    <!-- Hero -->
+    <div class="cc-hero">
+        <div class="container">
+            <button type="button" class="cc-back-btn" @onclick="VolverARecetas">
+                <span class="bi bi-arrow-left"></span> Volver al recetario
+            </button>
+            <h1 class="cc-hero-title">
+                @(Id == null ? "✨ Nueva Receta" : "🖋 Editar Receta")
+            </h1>
+            <p class="cc-hero-sub">
+                @(Id == null ? "Escribe una nueva entrada en tu grimorio culinario" : "Corrige y perfecciona esta receta")
+            </p>
+        </div>
+    </div>
+
+    <div class="container">
+
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <div class="cc-alert-error" role="alert">
+                <span><span class="bi bi-exclamation-circle me-2"></span>@mensajeError</span>
+                <button type="button" class="btn-close btn-close-cc btn-close-sm" @onclick="() => mensajeError = string.Empty"></button>
+            </div>
+        }
+
+        @if (cargando)
+        {
+            <div class="cc-loading">
+                <div class="spinner-border cc-spinner mb-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mb-0">Recogiendo los ingredientes del jardín...</p>
+            </div>
+        }
+        else
+        {
+            <EditForm Model="modelo" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="row g-4">
+
+                    <!-- ── Columna principal ── -->
+                    <div class="col-12 col-lg-8">
+
+                        <!-- Información General -->
+                        <div class="cc-card">
+                            <div class="cc-card-header">
+                                <span class="cc-card-header-icon">📜</span>
+                                <h2 class="cc-card-header-title">Información General</h2>
+                            </div>
+                            <div class="cc-card-body">
+                                <div class="mb-4">
+                                    <label class="cc-label">Título <span class="required">*</span></label>
+                                    <InputText @bind-Value="modelo.Titulo" class="cc-input"
+                                               placeholder="Ej: Mermelada de mora silvestre..." />
+                                    <ValidationMessage For="@(() => modelo.Titulo)" class="validation-message" />
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="cc-label">Descripción</label>
+                                    <InputTextArea @bind-Value="modelo.Descripcion" class="cc-input" rows="3"
+                                                   placeholder="Una breve historia de esta receta..." />
+                                    <ValidationMessage For="@(() => modelo.Descripcion)" class="validation-message" />
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="cc-label">Instrucciones <span class="required">*</span></label>
+                                    <InputTextArea @bind-Value="modelo.Instrucciones" class="cc-input" rows="9"
+                                                   placeholder="Paso 1: Con cariño y paciencia..." />
+                                    <ValidationMessage For="@(() => modelo.Instrucciones)" class="validation-message" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categorías e Ingredientes -->
+                        <div class="cc-card">
+                            <div class="cc-card-header">
+                                <span class="cc-card-header-icon">🌸</span>
+                                <h2 class="cc-card-header-title">Categorías e Ingredientes</h2>
+                            </div>
+                            <div class="cc-card-body">
+
+                                <div class="mb-4">
+                                    <label class="cc-label mb-2">Categorías</label>
+                                    <div class="cc-section-divider">🍃</div>
+                                    @if (categorias != null)
+                                    {
+                                        <div class="cc-chips">
+                                            @foreach (var cat in categorias)
+                                            {
+                                                <div class="cc-chip">
+                                                    <input type="checkbox" id="cat-@cat.Id"
+                                                           checked="@modelo.CategoriaIds.Contains(cat.Id)"
+                                                           @onchange="e => ToggleCategoria(cat.Id, (bool)(e.Value ?? false))" />
+                                                    <label for="cat-@cat.Id">@cat.Nombre</label>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="cc-label mb-2">Ingredientes</label>
+                                    <div class="cc-section-divider">🌿</div>
+                                    @if (ingredientes != null)
+                                    {
+                                        <div class="cc-chips">
+                                            @foreach (var ing in ingredientes)
+                                            {
+                                                <div class="cc-chip">
+                                                    <input type="checkbox" id="ing-@ing.Id"
+                                                           checked="@modelo.IngredienteIds.Contains(ing.Id)"
+                                                           @onchange="e => ToggleIngrediente(ing.Id, (bool)(e.Value ?? false))" />
+                                                    <label for="ing-@ing.Id">@ing.Nombre</label>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Sidebar ── -->
+                    <div class="col-12 col-lg-4">
+
+                        <!-- Detalles -->
+                        <div class="cc-card">
+                            <div class="cc-card-header">
+                                <span class="cc-card-header-icon">🕰️</span>
+                                <h2 class="cc-card-header-title">Detalles</h2>
+                            </div>
+                            <div class="cc-card-body">
+
+                                <div class="mb-4">
+                                    <label class="cc-label">Tiempo de preparación (min)</label>
+                                    <InputNumber @bind-Value="modelo.TiempoPreparacionMinutos" class="cc-input" min="0" />
+                                    <ValidationMessage For="@(() => modelo.TiempoPreparacionMinutos)" class="validation-message" />
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="cc-label">Tiempo de cocción (min)</label>
+                                    <InputNumber @bind-Value="modelo.TiempoCoccionMinutos" class="cc-input" min="0" />
+                                    <ValidationMessage For="@(() => modelo.TiempoCoccionMinutos)" class="validation-message" />
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="cc-label">Porciones</label>
+                                    <InputNumber @bind-Value="modelo.Porciones" class="cc-input" min="1" />
+                                    <ValidationMessage For="@(() => modelo.Porciones)" class="validation-message" />
+                                </div>
+
+                                <div style="border-top: 1px dashed var(--cc-border); padding-top: 16px;">
+                                    <div class="cc-switch-wrap">
+                                        <InputCheckbox @bind-Value="modelo.EstaPublicado"
+                                                       class="form-check-input"
+                                                       id="publicado" />
+                                        <label class="cc-switch-label" for="publicado">Publicar receta</label>
+                                    </div>
+                                    <p class="cc-switch-hint ms-1">
+                                        Sin activar, se guardará como borrador 🌱
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="cc-card">
+                            <div class="cc-card-body">
+                                <div class="d-grid gap-3">
+                                    <button type="submit" class="btn-cc-save" disabled="@guardando">
+                                        @if (guardando)
+                                        {
+                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            <span>Guardando...</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="bi bi-check-lg"></span>
+                                            <span>@(Id == null ? "Crear Receta" : "Guardar Cambios")</span>
+                                        }
+                                    </button>
+                                    <button type="button" class="btn-cc-cancel" @onclick="VolverARecetas">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+
+    private RecetaCreacionDto modelo = new();
+    private List<CategoriaDto>? categorias;
+    private List<IngredienteDto>? ingredientes;
+    private bool cargando = true;
+    private bool guardando = false;
+    private string mensajeError = string.Empty;
+
+    private void VolverARecetas() => navigation.NavigateTo("/recetas");
+
+    protected override async Task OnInitializedAsync()
+    {
+        var tareaCategorias = categoriaService.ObtenerTodas();
+        var tareaIngredientes = ingredienteService.ObtenerTodos();
+        await Task.WhenAll(tareaCategorias, tareaIngredientes);
+        categorias = tareaCategorias.Result;
+        ingredientes = tareaIngredientes.Result;
+
+        if (Id.HasValue)
+        {
+            var receta = await recetaService.ObtenerPorId(Id.Value);
+            if (receta == null)
+            {
+                navigation.NavigateTo("/recetas");
+                return;
+            }
+
+            modelo = new RecetaCreacionDto
+            {
+                Titulo = receta.Titulo,
+                Descripcion = receta.Descripcion,
+                Instrucciones = receta.Instrucciones,
+                TiempoPreparacionMinutos = receta.TiempoPreparacionMinutos,
+                TiempoCoccionMinutos = receta.TiempoCoccionMinutos,
+                Porciones = receta.Porciones,
+                EstaPublicado = receta.EstaPublicado,
+                CategoriaIds = receta.CategoriaIds,
+                IngredienteIds = receta.IngredienteIds
+            };
+        }
+
+        cargando = false;
+    }
+
+    private void ToggleCategoria(int id, bool seleccionado)
+    {
+        if (seleccionado && !modelo.CategoriaIds.Contains(id))
+            modelo.CategoriaIds.Add(id);
+        else if (!seleccionado)
+            modelo.CategoriaIds.Remove(id);
+    }
+
+    private void ToggleIngrediente(int id, bool seleccionado)
+    {
+        if (seleccionado && !modelo.IngredienteIds.Contains(id))
+            modelo.IngredienteIds.Add(id);
+        else if (!seleccionado)
+            modelo.IngredienteIds.Remove(id);
+    }
+
+    private async Task HandleSubmit()
+    {
+        guardando = true;
+        mensajeError = string.Empty;
+
+        try
+        {
+            if (Id.HasValue)
+            {
+                var modificacion = new RecetaModificacionDto
+                {
+                    Titulo = modelo.Titulo,
+                    Descripcion = modelo.Descripcion,
+                    Instrucciones = modelo.Instrucciones,
+                    TiempoPreparacionMinutos = modelo.TiempoPreparacionMinutos,
+                    TiempoCoccionMinutos = modelo.TiempoCoccionMinutos,
+                    Porciones = modelo.Porciones,
+                    EstaPublicado = modelo.EstaPublicado,
+                    CategoriaIds = modelo.CategoriaIds,
+                    IngredienteIds = modelo.IngredienteIds
+                };
+
+                var resultado = await recetaService.Actualizar(Id.Value, modificacion);
+
+                if (resultado)
+                    navigation.NavigateTo($"/recetas/{Id.Value}");
+                else
+                    mensajeError = "No se pudo actualizar la receta";
+            }
+            else
+            {
+                var resultado = await recetaService.Crear(modelo);
+
+                if (resultado != null)
+                    navigation.NavigateTo($"/recetas/{resultado.Id}");
+                else
+                    mensajeError = "No se pudo crear la receta. Verifica los datos.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+}

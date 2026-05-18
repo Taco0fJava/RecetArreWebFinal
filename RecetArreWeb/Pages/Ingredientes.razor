@@ -1,0 +1,412 @@
+@page "/ingredientes"
+@attribute [Authorize]
+@inject IIngredienteService ingredienteService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Almacén de Ingredientes Mágicos uwu</PageTitle>
+
+<style>
+   /* @@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');*/
+    /*Aqui se define el estilo de la página*/
+    :root {
+        --sage-green: #84a98c;
+        --deep-sage: #52796f;
+        --cream: #fdfcf0;
+        --warm-white: #fffcf2;
+        --terracotta: #b56576;
+        --wheat: #e9c46a;
+        --text-dark: #354f52;
+        --shadow-rustic: 0 6px 15px rgba(53, 79, 82, 0.1);
+        --radius-organic: 20px 10px 20px 10px;
+    }
+    
+    .ingredient-container {
+        background-color: var(--cream);
+        background-image: radial-gradient(var(--sage-green) 0.5px, transparent 0.5px);
+        background-size: 30px 30px;
+        min-height: 100vh;
+        font-family: 'Lora', serif;
+        color: var(--text-dark);
+    }
+
+    /* Encabezado Estilo Despensa */
+    .header-section {
+        background: var(--warm-white);
+        border: 2px dashed var(--sage-green);
+        border-radius: var(--radius-organic);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-rustic);
+    }
+
+    .title-cottage {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        color: var(--deep-sage);
+        font-weight: 700;
+    }
+
+    .btn-brand-cottage {
+        background: var(--terracotta);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 0px #8e4453;
+    }
+
+        .btn-brand-cottage:hover {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0px #8e4453;
+            background: #9d5262;
+            color: white;
+        }
+
+    /* Tarjetas de Ingredientes */
+    .ingredient-card {
+        background: var(--warm-white);
+        border: 1px solid rgba(132, 169, 140, 0.3);
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .ingredient-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--sage-green);
+        }
+
+        .ingredient-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-rustic);
+        }
+
+    /* Tabla Rústica */
+    .table-cottage-wrapper {
+        background: var(--warm-white);
+        border-radius: 15px;
+        border: 1px solid var(--sage-green);
+        overflow: hidden;
+    }
+
+    .table-cottage thead {
+        background: var(--deep-sage);
+        color: var(--warm-white);
+    }
+
+    .table-cottage th {
+        font-family: 'Playfair Display', serif;
+        font-weight: 500;
+        padding: 1rem;
+    }
+
+    /* Zona del buscadorr */
+    .form-control-cottage {
+        border: 1px solid var(--sage-green);
+        border-radius: 10px;
+        padding: 0.6rem 1rem;
+        background: white;
+    }
+
+    /* Modal Estilo Pergamino */
+    .modal-cottage-content {
+        background-color: var(--cream);
+        border: 3px double var(--wheat);
+        border-radius: var(--radius-organic);
+        font-family: 'Lora', serif;
+    }
+
+    .modal-header-cottage {
+        border-bottom: 1px dashed var(--sage-green);
+    }
+
+    /* Color de las alertas */
+    .alert-cottage {
+        border-radius: 10px;
+        border: 2px dashed currentColor;
+        background: var(--warm-white);
+    }
+</style>
+
+<div class="ingredient-container">
+    <div class="container py-4">
+        
+        <div class="header-section">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="title-cottage mb-1">Almacén de Ingredientes</h1>
+                    <p class="text-muted mb-0">Cultiva y organiza los tesoros de tu cocina</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <button class="btn btn-brand-cottage" @onclick="AbrirModalCrear">
+                        <i class="bi bi-plus-circle me-2"></i> Nuevo Ingrediente
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <div class="alert alert-cottage text-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-leaf me-2"></i> <strong>Aviso:</strong> @mensajeError
+                <button type="button" class="btn-close" @onclick="() => mensajeError = string.Empty"></button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(mensajeExito))
+        {
+            <div class="alert alert-cottage text-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-stars me-2"></i> <strong>¡Hecho!</strong> @mensajeExito
+                <button type="button" class="btn-close" @onclick="() => mensajeExito = string.Empty"></button>
+            </div>
+        }
+
+        <div class="row mb-4">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="position-relative">
+                    <i class="bi bi-search position-absolute" style="left: 1rem; top: 50%; transform: translateY(-50%); color: var(--sage-green);"></i>
+                    <input type="text" class="form-control-cottage w-100 ps-5" placeholder="Buscar en la despensa..."
+                           @bind="busqueda" @bind:event="oninput" />
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <button class="btn btn-outline-dark w-100" style="border-radius:10px;" @onclick="LimpiarBusqueda">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            @if (ingredientes == null)
+            {
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-success" role="status"></div>
+                    <p class="mt-3">Revisando estanterías...</p>
+                </div>
+            }
+            else if (!ingredientes.Any())
+            {
+                <div class="col-12">
+                    <div class="alert alert-cottage text-center p-5">
+                        <h4 class="title-cottage">Despensa vacía</h4>
+                        <p>No hay ingredientes registrados. ¡Empieza por añadir algo fresco!</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @foreach (var ingrediente in IngredientesFiltrados)
+                {
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                        <div class="card ingredient-card h-100 border-0 shadow-sm">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="title-cottage" style="font-size: 1.2rem;">@ingrediente.Nombre</h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm text-muted" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu shadow border-0">
+                                            <li><button class="dropdown-item" @onclick="() => AbrirModalEditar(ingrediente)"><i class="bi bi-pencil me-2"></i>Editar</button></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><button class="dropdown-item text-danger" @onclick="() => EliminarIngrediente(ingrediente.Id)"><i class="bi bi-trash me-2"></i>Eliminar</button></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <p class="card-text text-muted small flex-grow-1" style="font-style: italic;">
+                                    <i class="bi bi-quote me-1"></i>
+                                    @(string.IsNullOrEmpty(ingrediente.Notas) ? "Sin nada que agregar jijiji." : ingrediente.Notas)
+                                </p>
+
+                                <div class="border-top pt-2 mt-3 text-muted" style="font-size: 0.75rem;">
+                                    <i class="bi bi-calendar3 me-1"></i> @ingrediente.CreadoUtc.ToString("dd/MM/yyyy")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <h4 class="title-cottage mb-3"><i class="bi bi-list-check me-2"></i>Vista Detallada</h4>
+                <div class="table-cottage-wrapper shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 table-cottage">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Ingrediente</th>
+                                    <th>Notas del Herbolario</th>
+                                    <th>Registrado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ingredientes != null && ingredientes.Any())
+                                {
+                                    @foreach (var ingrediente in IngredientesFiltrados)
+                                    {
+                                        <tr>
+                                            <td class="text-muted">#@ingrediente.Id</td>
+                                            <td class="fw-bold" style="color: var(--deep-sage)">@ingrediente.Nombre</td>
+                                            <td class="small">@(string.IsNullOrEmpty(ingrediente.Notas) ? "-" : ingrediente.Notas)</td>
+                                            <td>@ingrediente.CreadoUtc.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-outline-success me-1" @onclick="() => AbrirModalEditar(ingrediente)"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarIngrediente(ingrediente.Id)"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="5" class="text-center py-4">No se encontraron ingredientes en los registros.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (mostrarModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(53, 79, 82, 0.6); backdrop-filter: blur(4px);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-cottage-content shadow-lg">
+                <div class="modal-header modal-header-cottage">
+                    <h5 class="modal-title title-cottage">
+                        <i class="bi bi-journal-plus me-2"></i>
+                        @(ingredienteEditando == null ? "Nuevo Ingrediente" : "Editar Ingrediente")
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Ingrediente <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-cottage" @bind="nombreIngrediente"
+                               placeholder="Ej: Miel de azahar, Romero fresco..." />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Notas o Procedencia</label>
+                        <textarea class="form-control form-control-cottage" rows="3" @bind="notasIngrediente"
+                                  placeholder="Notas adicionales sobre este ingrediente..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-link text-dark text-decoration-none" @onclick="CerrarModal">Cerrar</button>
+                    <button type="button" class="btn btn-brand-cottage" @onclick="GuardarIngrediente" disabled="@guardando">
+                        @if (guardando)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                        }
+                        @(ingredienteEditando == null ? "Añadir a Despensa" : "Actualizar")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {  
+  
+    private List<IngredienteDto>? ingredientes;
+    private string busqueda = "";
+    private bool mostrarModal = false;
+    private bool guardando = false;
+    private IngredienteDto? ingredienteEditando = null;
+    private string nombreIngrediente = "";
+    private string notasIngrediente = "";
+    private string mensajeError = string.Empty;
+    private string mensajeExito = string.Empty;
+
+    private IEnumerable<IngredienteDto> IngredientesFiltrados
+    {
+        get
+        {
+            if (ingredientes == null) return Enumerable.Empty<IngredienteDto>();
+            if (string.IsNullOrWhiteSpace(busqueda)) return ingredientes;
+            return ingredientes.Where(i =>
+                i.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+                (i.Notas?.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ?? false)
+            );
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarIngredientes();
+    }
+
+    private async Task CargarIngredientes()
+    {
+        try { ingredientes = await ingredienteService.ObtenerTodos(); }
+        catch (Exception ex) { mensajeError = $"Error al cargar: {ex.Message}"; ingredientes = new List<IngredienteDto>(); }
+    }
+
+    private void AbrirModalCrear()
+    {
+        ingredienteEditando = null; nombreIngrediente = ""; notasIngrediente = "";
+        mensajeError = string.Empty; mostrarModal = true;
+    }
+
+    private void AbrirModalEditar(IngredienteDto ingrediente)
+    {
+        ingredienteEditando = ingrediente; nombreIngrediente = ingrediente.Nombre;
+        notasIngrediente = ingrediente.Notas ?? ""; mensajeError = string.Empty; mostrarModal = true;
+    }
+
+    private void CerrarModal() { mostrarModal = false; ingredienteEditando = null; }
+
+    private async Task GuardarIngrediente()
+    {
+        if (string.IsNullOrWhiteSpace(nombreIngrediente)) { mensajeError = "El nombre es requerido"; return; }
+        guardando = true; mensajeError = string.Empty; mensajeExito = string.Empty;
+        try
+        {
+            if (ingredienteEditando == null)
+            {
+                var nuevo = new IngredienteCreacionDto { Nombre = nombreIngrediente, Notas = notasIngrediente };
+                var resultado = await ingredienteService.Crear(nuevo);
+                if (resultado != null) { mensajeExito = "Añadido con éxito"; await CargarIngredientes(); CerrarModal(); }
+                else { mensajeError = "No se pudo crear. Revisa si ya existe."; }
+            }
+            else
+            {
+                var mod = new IngredienteModificacionDto { Nombre = nombreIngrediente, Notas = notasIngrediente };
+                var resultado = await ingredienteService.Actualizar(ingredienteEditando.Id, mod);
+                if (resultado) { mensajeExito = "Actualizado correctamente"; await CargarIngredientes(); CerrarModal(); }
+                else { mensajeError = "No se pudo actualizar."; }
+            }
+        }
+        catch (Exception ex) { mensajeError = $"Error: {ex.Message}"; }
+        finally { guardando = false; }
+    }
+
+    private async Task EliminarIngrediente(int id)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", "¿Seguro que quieres retirar este ingrediente de la despensa?")) return;
+        mensajeError = string.Empty; mensajeExito = string.Empty;
+        try
+        {
+            var resultado = await ingredienteService.Eliminar(id);
+            if (resultado) { mensajeExito = "Retirado con éxito"; await CargarIngredientes(); }
+            else { mensajeError = "No se pudo eliminar."; }
+        }
+        catch (Exception ex) { mensajeError = $"Error: {ex.Message}"; }
+    }
+
+    private void LimpiarBusqueda() => busqueda = "";
+}

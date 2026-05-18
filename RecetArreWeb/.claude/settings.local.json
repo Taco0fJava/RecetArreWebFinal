@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet restore *)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet ef *)",
+      "Bash(dotnet tool *)",
+      "Bash(dotnet publish *)",
+      "Read(//c/Users/yarag/OneDrive/Escritorio/RecetArreWeb-master/**)"
+    ]
+  }
+}

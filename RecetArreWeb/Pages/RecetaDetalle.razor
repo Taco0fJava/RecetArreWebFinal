@@ -1,0 +1,516 @@
+@page "/recetas/{Id:int}"
+@inject IRecetaService recetaService
+@inject IComentarioService comentarioService
+@inject ICategoriaService categoriaService
+@inject IIngredienteService ingredienteService
+@inject IRankingService rankingService
+@inject NavigationManager navigation
+@inject IJSRuntime JSRuntime
+
+<style>
+    :root {
+        --cottage-bg: #f9f7f2;
+        --cottage-card: #f4eee1;
+        --cottage-green: #7d8c6a;
+        --cottage-green-light: #d8e2dc;
+        --cottage-brown: #8c7851;
+        --cottage-text: #5d4e37;
+        --cottage-border: #d6cfc1;
+    }
+
+    .cottage-container {
+        background-color: var(--cottage-bg);
+        background-image: radial-gradient(#d6cfc1 1px, transparent 1px);
+        background-size: 20px 20px; /* Patrón de cruces sutil como el de tu imagen */
+        min-height: 100vh;
+        color: var(--cottage-text);
+        font-family: 'Georgia', serif;
+    }
+
+    .cottage-card {
+        background-color: var(--cottage-card);
+        border: 1px solid var(--cottage-border);
+        border-radius: 15px;
+        box-shadow: none;
+        margin-bottom: 1.5rem;
+    }
+
+    .cottage-header {
+        font-family: 'Times New Roman', serif;
+        color: var(--cottage-brown);
+        font-style: italic;
+        border-bottom: 1px dashed var(--cottage-border);
+        padding-bottom: 10px;
+    }
+
+    .cottage-btn {
+        background-color: var(--cottage-green);
+        color: white;
+        border-radius: 20px;
+        border: none;
+        padding: 8px 20px;
+        transition: all 0.3s;
+    }
+
+        .cottage-btn:hover {
+            background-color: #6b7a59;
+            transform: translateY(-1px);
+        }
+
+    .cottage-btn-outline {
+        background-color: transparent;
+        border: 1px solid var(--cottage-border);
+        color: var(--cottage-brown);
+        border-radius: 20px;
+    }
+
+    .cottage-badge {
+        background-color: var(--cottage-green-light);
+        color: var(--cottage-green);
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-weight: normal;
+        border: 1px solid var(--cottage-green);
+    }
+
+    .divider-dashed {
+        border-top: 1px dashed var(--cottage-border);
+        margin: 15px 0;
+    }
+
+    .list-item-cottage {
+        background: transparent;
+        border: none;
+        border-bottom: 1px dashed var(--cottage-border);
+        padding: 10px 0;
+    }
+
+    .comment-bubble {
+        background: #ffffff90;
+        border-radius: 15px;
+        padding: 15px;
+        border: 1px solid var(--cottage-border);
+    }
+
+    /* Estilo del input inspirado en tu buscador */
+    .cottage-input {
+        background-color: #fdfcf8;
+        border: 1px solid var(--cottage-border);
+        border-radius: 20px;
+        padding: 10px 20px;
+    }
+
+    /* ── Ranking & Medallas ── */
+    .star-btn {
+        background: none;
+        border: none;
+        font-size: 1.6rem;
+        cursor: pointer;
+        padding: 0 2px;
+        transition: transform 0.15s;
+        line-height: 1;
+    }
+    .star-btn:hover { transform: scale(1.25); }
+    .medalla-badge {
+        font-size: 1.1rem;
+        background-color: #fff8e1;
+        border: 1px solid #f0d080;
+        border-radius: 10px;
+        padding: 8px 14px;
+        display: inline-block;
+    }
+    .promedio-texto {
+        font-size: 0.85rem;
+        color: var(--cottage-text);
+        opacity: 0.75;
+    }
+</style>
+
+<div class="cottage-container py-4">
+    <div class="container">
+        @if (receta == null)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="mt-3">Preparando la mesa...</p>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <button class="cottage-btn-outline btn btn-sm" @onclick="VolverARecetas">
+                    <span class="bi bi-arrow-left"></span> Volver al Recetario
+                </button>
+                
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="dropdown">
+                            <button class="cottage-btn-outline btn btn-sm" data-bs-toggle="dropdown">
+                                <span class="bi bi-gear"></span>
+                            </button>
+                            <ul class="dropdown-menu border-0 shadow-sm cottage-card">
+                                <li><button class="dropdown-item" @onclick="IrAEditar">Editar Receta</button></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><button class="dropdown-item text-danger" @onclick="EliminarReceta">Eliminar</button></li>
+                            </ul>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+
+            @if (!string.IsNullOrEmpty(mensajeExito))
+            {
+                <div class="alert alert-success border-0 cottage-card">@mensajeExito</div>
+            }
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="cottage-card p-4 mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="bi bi-flower1" style="color: #e5989b;"></span>
+                            <h1 class="cottage-header h2 mb-0">@receta.Titulo</h1>
+                        </div>
+
+                        <div class="mb-3">
+                            @if (receta.EstaPublicado)
+                            {
+                                <span class="cottage-badge">🌿 Publicado con ternura</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-muted border">Borrador</span>
+                            }
+                        </div>
+
+                        <p class="fst-italic opacity-75">@receta.Descripcion</p>
+                        
+                        <div class="divider-dashed"></div>
+
+                        <div class="row text-center g-3">
+                            <div class="col-3">
+                                <small class="d-block text-muted">Prep</small>
+                                <strong>@receta.TiempoPreparacionMinutos'</strong>
+                            </div>
+                            <div class="col-3">
+                                <small class="d-block text-muted">Fuego</small>
+                                <strong>@receta.TiempoCoccionMinutos'</strong>
+                            </div>
+                            <div class="col-3">
+                                <small class="d-block text-muted">Mesa</small>
+                                <strong>@receta.Porciones pers.</strong>
+                            </div>
+                            <div class="col-3">
+                                <small class="d-block text-muted">Total</small>
+                                <strong>@(receta.TiempoPreparacionMinutos + receta.TiempoCoccionMinutos)'</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cottage-card p-4">
+                        <h4 class="cottage-header"><span class="bi bi-journal-text me-2"></span>Preparación</h4>
+                        <div class="mt-3" style="white-space: pre-line; line-height: 1.8;">
+                            @receta.Instrucciones
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <h5 class="cottage-header mb-4">Pensamientos y Notas (@(comentarios?.Count ?? 0))</h5>
+                        
+                        <AuthorizeView>
+                            <Authorized>
+                                <div class="mb-4">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control cottage-input" placeholder="Añade una nota..."
+                                               @bind="nuevoComentario" @onkeydown="HandleKeyDown" />
+                                        <button class="cottage-btn ms-2" @onclick="CrearComentario" disabled="@enviandoComentario">
+                                            @if (enviandoComentario)
+                                            {
+                                                <span class="spinner-border spinner-border-sm"></span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="bi bi-feather"></span>
+                                            }
+                                        </button>
+                                    </div>
+                                </div>
+                            </Authorized>
+                        </AuthorizeView>
+
+                        @if (comentarios != null)
+                        {
+                            @foreach (var comentario in comentarios)
+                            {
+                                <div class="comment-bubble mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-bold small">@comentario.UsuarioId[..5]... dice:</span>
+                                        <span class="text-muted small">@comentario.CreadoUtc.ToShortDateString()</span>
+                                    </div>
+                                    <p class="mb-0">@comentario.Contenido</p>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="cottage-card p-4">
+                        <h5 class="cottage-header"><span class="bi bi-basket me-2"></span>Ingredientes</h5>
+                        <ul class="list-group list-group-flush mt-3">
+                            @if (ingredientes != null)
+                            {
+                                @foreach (var ingId in receta.IngredienteIds)
+                                {
+                                    var ing = ingredientes.FirstOrDefault(i => i.Id == ingId);
+                                    if (ing != null)
+                                    {
+                                        <li class="list-item-cottage d-flex align-items-center">
+                                            <span class="bi bi-dot fs-4 text-success"></span> @ing.Nombre
+                                        </li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    </div>
+
+                    <div class="cottage-card p-4">
+                        <h5 class="cottage-header"><span class="bi bi-tags me-2"></span>Etiquetas</h5>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            @if (categorias != null)
+                            {
+                                @foreach (var catId in receta.CategoriaIds)
+                                {
+                                    var cat = categorias.FirstOrDefault(c => c.Id == catId);
+                                    if (cat != null)
+                                    {
+                                        <span class="cottage-badge" style="font-size: 0.85rem;"># @cat.Nombre</span>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <!-- ── MEDALLA Y RANKING ── -->
+                    <div class="cottage-card p-4">
+                        <h5 class="cottage-header"><span class="bi bi-star me-2"></span>Valoración</h5>
+
+                        @if (medalla != null)
+                        {
+                            <div class="text-center my-2">
+                                <div class="medalla-badge mb-1">@medalla.Medalla</div>
+                                <div class="promedio-texto mt-1">
+                                    @RenderEstrellas(medalla.PromedioEstrellas)
+                                    <span class="ms-1">@medalla.PromedioEstrellas.ToString("F1") / 5</span>
+                                </div>
+                                <div class="promedio-texto">@medalla.TotalVotos voto(s)</div>
+                            </div>
+                        }
+
+                        <div class="divider-dashed"></div>
+
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (miRanking == null)
+                                {
+                                    <div class="text-center">
+                                        <p class="small mb-2" style="color:var(--cottage-brown)">¿Qué te pareció?</p>
+                                        <div class="d-flex justify-content-center gap-1">
+                                            @for (int s = 1; s <= 5; s++)
+                                            {
+                                                var estrella = s;
+                                                <button class="star-btn"
+                                                        title="@estrella estrellas"
+                                                        @onclick="() => CalificarReceta(estrella)"
+                                                        disabled="@enviandoRanking">
+                                                    @(estrella <= estrellaHover ? "⭐" : "☆")
+                                                </button>
+                                            }
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(mensajeRanking))
+                                        {
+                                            <p class="small text-danger mt-1">@mensajeRanking</p>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-center">
+                                        <p class="small mb-1" style="color:var(--cottage-brown)">Tu calificación:</p>
+                                        <div class="d-flex justify-content-center gap-1 mb-2">
+                                            @for (int s = 1; s <= 5; s++)
+                                            {
+                                                var estrella = s;
+                                                <button class="star-btn"
+                                                        title="Cambiar a @estrella estrellas"
+                                                        @onclick="() => ActualizarRanking(estrella)"
+                                                        disabled="@enviandoRanking">
+                                                    @(estrella <= miRanking.Valor ? "⭐" : "☆")
+                                                </button>
+                                            }
+                                        </div>
+                                        <button class="btn btn-sm cottage-btn-outline" @onclick="EliminarRanking">
+                                            <span class="bi bi-x-circle me-1"></span>Quitar calificación
+                                        </button>
+                                    </div>
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                <p class="small text-center opacity-75">Inicia sesión para calificar esta receta</p>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+
+                    <div class="text-center opacity-50 mt-4">
+                        <span class="bi bi-flower2 fs-3"></span>
+                        <p class="small">Hecho con cuidado y ternura</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    // ── datos originales ──
+    private RecetaDto? receta;
+    private List<ComentarioDto>? comentarios;
+    private List<CategoriaDto>? categorias;
+    private List<IngredienteDto>? ingredientes;
+    private string nuevoComentario = "";
+    private bool enviandoComentario = false;
+    private string mensajeExito = string.Empty;
+    private string mensajeError = string.Empty;
+
+    // ── datos de ranking ──
+    private MedallaDto? medalla;
+    private RankingDto? miRanking;
+    private int estrellaHover = 0;
+    private bool enviandoRanking = false;
+    private string mensajeRanking = string.Empty;
+
+    private void VolverARecetas() => navigation.NavigateTo("/recetas");
+    private void IrAEditar() => navigation.NavigateTo($"/recetas/editar/{Id}");
+
+    protected override async Task OnInitializedAsync()
+    {
+        var tareaReceta      = recetaService.ObtenerPorId(Id);
+        var tareaComentarios = comentarioService.ObtenerPorReceta(Id);
+        var tareaCategorias  = categoriaService.ObtenerTodas();
+        var tareaIngredientes = ingredienteService.ObtenerTodos();
+        var tareaMedalla     = rankingService.ObtenerMedalla(Id);
+        var tareaMiRanking   = rankingService.ObtenerMiRanking(Id);
+
+        await Task.WhenAll(tareaReceta, tareaComentarios, tareaCategorias,
+                           tareaIngredientes, tareaMedalla, tareaMiRanking);
+
+        receta       = tareaReceta.Result;
+        comentarios  = tareaComentarios.Result;
+        categorias   = tareaCategorias.Result;
+        ingredientes = tareaIngredientes.Result;
+        medalla      = tareaMedalla.Result;
+        miRanking    = tareaMiRanking.Result;
+
+        if (receta == null) navigation.NavigateTo("/recetas");
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(nuevoComentario)) await CrearComentario();
+    }
+
+    private async Task CrearComentario()
+    {
+        if (string.IsNullOrWhiteSpace(nuevoComentario)) return;
+        enviandoComentario = true;
+        var dto = new ComentarioCreacionDto { Contenido = nuevoComentario.Trim(), RecetaId = Id };
+        var resultado = await comentarioService.Crear(dto);
+        if (resultado != null)
+        {
+            nuevoComentario = "";
+            comentarios = await comentarioService.ObtenerPorReceta(Id);
+        }
+        enviandoComentario = false;
+    }
+
+    private async Task EliminarComentario(int comentarioId)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", "¿Eliminar este comentario?")) return;
+        var resultado = await comentarioService.Eliminar(comentarioId);
+        if (resultado) comentarios = await comentarioService.ObtenerPorReceta(Id);
+    }
+
+    private async Task EliminarReceta()
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", "¿Estás seguro de eliminar esta receta?")) return;
+        var resultado = await recetaService.Eliminar(Id);
+        if (resultado) navigation.NavigateTo("/recetas");
+    }
+
+    // ── métodos de ranking ──────────────────────────────────────────
+
+    private async Task CalificarReceta(int valor)
+    {
+        enviandoRanking = true;
+        mensajeRanking = string.Empty;
+
+        try
+        {
+            var dto = new RankingCreacionDto { RecetaId = Id, Valor = valor };
+            miRanking = await rankingService.Crear(dto);
+            medalla   = await rankingService.ObtenerMedalla(Id);
+        }
+        catch (Exception ex)
+        {
+            mensajeRanking = ex.Message;
+        }
+        finally
+        {
+            enviandoRanking = false;
+        }
+    }
+
+    private async Task ActualizarRanking(int valor)
+    {
+        if (miRanking == null) return;
+        enviandoRanking = true;
+
+        var dto = new RankingModificacionDto { Valor = valor };
+        var ok = await rankingService.Actualizar(miRanking.Id, dto);
+
+        if (ok)
+        {
+            miRanking.Valor = valor;
+            medalla = await rankingService.ObtenerMedalla(Id);
+        }
+
+        enviandoRanking = false;
+    }
+
+    private async Task EliminarRanking()
+    {
+        if (miRanking == null) return;
+        enviandoRanking = true;
+
+        var ok = await rankingService.Eliminar(miRanking.Id);
+
+        if (ok)
+        {
+            miRanking = null;
+            medalla = await rankingService.ObtenerMedalla(Id);
+        }
+
+        enviandoRanking = false;
+    }
+
+    // Renderiza estrellas llenas/vacías según el promedio
+    private string RenderEstrellas(double promedio)
+    {
+        var resultado = "";
+        for (int i = 1; i <= 5; i++)
+            resultado += i <= Math.Round(promedio) ? "⭐" : "☆";
+        return resultado;
+    }
+}

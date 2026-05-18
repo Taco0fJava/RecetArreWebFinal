@@ -1,0 +1,730 @@
+@page "/categorias"
+@attribute [Authorize]
+@inject ICategoriaService categoriaService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Gestión de Categorías</PageTitle>
+
+<style>
+  /* import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');*/
+
+    /* ─── Cottagecore Variables ─── */
+    :root {
+        --cc-parchment:    #f5f0e8;
+        --cc-cream:        #faf6ee;
+        --cc-linen:        #ede6d6;
+        --cc-bark:         #7a5c3a;
+        --cc-bark-light:   #a07850;
+        --cc-moss:         #5a7a4a;
+        --cc-sage:         #8aab7a;
+        --cc-sage-pale:    #c8ddb8;
+        --cc-lavender:     #b8a8c8;
+        --cc-rose:         #d4836a;
+        --cc-rose-pale:    #e8c4b0;
+        --cc-berry:        #8b4563;
+        --cc-ink:          #3a2e22;
+        --cc-muted:        #8a7a68;
+        --cc-border:       #c8b898;
+        --cc-shadow:       rgba(90, 60, 30, 0.12);
+    }
+
+    /* ─── Base ─── */
+    .cc-wrapper {
+        background-color: var(--cc-parchment);
+        background-image:
+            url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8b898' fill-opacity='0.18'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        color: var(--cc-ink);
+        min-height: 100vh;
+        padding: 28px 24px;
+        font-family: 'Lora', Georgia, serif;
+    }
+
+    /* ─── Typography ─── */
+    .cc-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--cc-bark);
+        line-height: 1.2;
+        margin-bottom: 2px;
+    }
+    .cc-subtitle {
+        font-family: 'Lora', Georgia, serif;
+        font-size: 0.9rem;
+        color: var(--cc-muted);
+        font-style: italic;
+    }
+    .cc-section-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 1.2rem;
+        color: var(--cc-bark);
+        font-style: italic;
+    }
+
+    /* ─── Decorative divider ─── */
+    .cc-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 8px 0 20px;
+        color: var(--cc-border);
+        font-size: 1.1rem;
+    }
+    .cc-divider::before, .cc-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to right, transparent, var(--cc-border), transparent);
+    }
+
+    /* ─── Cards ─── */
+    .cc-card {
+        background-color: var(--cc-cream);
+        border: 1.5px solid var(--cc-border);
+        border-radius: 12px;
+        box-shadow: 0 3px 12px var(--cc-shadow), 0 1px 3px rgba(0,0,0,0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .cc-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--cc-sage), var(--cc-bark-light), var(--cc-rose));
+        opacity: 0.6;
+    }
+    .cc-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px var(--cc-shadow);
+    }
+    .cc-card-header-strip {
+        background-color: var(--cc-linen);
+        padding: 12px 16px 10px;
+        border-bottom: 1px solid var(--cc-border);
+        border-radius: 10px 10px 0 0;
+    }
+
+    /* ─── Buttons ─── */
+    .btn-cc-primary {
+        background-color: var(--cc-moss);
+        color: var(--cc-cream);
+        border: none;
+        border-radius: 30px;
+        padding: 8px 22px;
+        font-family: 'Lora', serif;
+        font-size: 0.9rem;
+        letter-spacing: 0.02em;
+        transition: background 0.2s ease, transform 0.15s ease;
+        box-shadow: 0 2px 8px rgba(90,122,74,0.25);
+    }
+    .btn-cc-primary:hover {
+        background-color: var(--cc-bark);
+        color: var(--cc-cream);
+        transform: translateY(-1px);
+    }
+    .btn-cc-outline {
+        background: transparent;
+        border: 1.5px solid var(--cc-bark-light);
+        color: var(--cc-bark);
+        border-radius: 30px;
+        padding: 7px 18px;
+        font-family: 'Lora', serif;
+        font-size: 0.88rem;
+        transition: all 0.2s ease;
+    }
+    .btn-cc-outline:hover {
+        background-color: var(--cc-linen);
+        border-color: var(--cc-bark);
+        color: var(--cc-bark);
+    }
+    .btn-cc-ghost {
+        background: transparent;
+        border: 1.5px solid var(--cc-sage);
+        color: var(--cc-moss);
+        border-radius: 8px;
+        padding: 4px 10px;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
+    }
+    .btn-cc-ghost:hover {
+        background-color: var(--cc-sage-pale);
+        border-color: var(--cc-moss);
+        color: var(--cc-moss);
+    }
+    .btn-cc-danger {
+        background: transparent;
+        border: 1.5px solid var(--cc-rose-pale);
+        color: var(--cc-rose);
+        border-radius: 8px;
+        padding: 4px 10px;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
+    }
+    .btn-cc-danger:hover {
+        background-color: #f5e4dc;
+        border-color: var(--cc-rose);
+        color: #b5522a;
+    }
+
+    /* ─── Inputs ─── */
+    .form-cc {
+        background-color: var(--cc-parchment);
+        border: 1.5px solid var(--cc-border);
+        color: var(--cc-ink);
+        border-radius: 10px;
+        font-family: 'Lora', serif;
+        font-size: 0.9rem;
+        padding: 8px 14px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-cc:focus {
+        background-color: var(--cc-cream);
+        border-color: var(--cc-sage);
+        box-shadow: 0 0 0 3px rgba(138, 171, 122, 0.2);
+        color: var(--cc-ink);
+        outline: none;
+    }
+    .form-cc::placeholder { color: var(--cc-muted); font-style: italic; }
+    .cc-label {
+        font-family: 'Lora', serif;
+        font-size: 0.85rem;
+        color: var(--cc-bark);
+        font-weight: 500;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    /* ─── Alerts ─── */
+    .cc-alert-error {
+        background-color: #f9ece7;
+        color: #7a3822;
+        border: 1.5px solid var(--cc-rose);
+        border-radius: 12px;
+        font-family: 'Lora', serif;
+        font-size: 0.9rem;
+        padding: 12px 16px;
+    }
+    .cc-alert-success {
+        background-color: #edf5e8;
+        color: #3a5a2a;
+        border: 1.5px solid var(--cc-sage);
+        border-radius: 12px;
+        font-family: 'Lora', serif;
+        font-size: 0.9rem;
+        padding: 12px 16px;
+    }
+
+    /* ─── Category Cards ─── */
+    .cc-category-card .card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.05rem;
+        color: var(--cc-bark);
+        font-weight: 600;
+    }
+    .cc-category-card .card-text {
+        font-size: 0.85rem;
+        color: var(--cc-muted);
+        font-style: italic;
+        line-height: 1.5;
+    }
+    .cc-date-badge {
+        font-size: 0.75rem;
+        color: var(--cc-sage);
+        font-family: 'Lora', serif;
+    }
+    .cc-tag {
+        display: inline-block;
+        background: var(--cc-sage-pale);
+        color: var(--cc-moss);
+        border-radius: 20px;
+        padding: 1px 10px;
+        font-size: 0.72rem;
+        font-family: 'Lora', serif;
+        letter-spacing: 0.03em;
+    }
+
+    /* ─── Dropdown ─── */
+    .dropdown-menu-cc {
+        background-color: var(--cc-cream);
+        border: 1.5px solid var(--cc-border);
+        border-radius: 10px;
+        box-shadow: 0 4px 14px var(--cc-shadow);
+        font-family: 'Lora', serif;
+        font-size: 0.88rem;
+    }
+    .dropdown-menu-cc .dropdown-item {
+        color: var(--cc-ink);
+        padding: 7px 16px;
+    }
+    .dropdown-menu-cc .dropdown-item:hover {
+        background-color: var(--cc-linen);
+        color: var(--cc-bark);
+    }
+    .dropdown-menu-cc .dropdown-divider { border-color: var(--cc-border); }
+
+    /* ─── Table ─── */
+    .cc-table {
+        font-family: 'Lora', serif;
+        font-size: 0.88rem;
+        color: var(--cc-ink);
+        margin-bottom: 0;
+    }
+    .cc-table thead th {
+        background-color: var(--cc-linen);
+        color: var(--cc-bark);
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border-bottom: 2px solid var(--cc-border);
+        padding: 12px 16px;
+        letter-spacing: 0.02em;
+    }
+    .cc-table tbody tr { border-bottom: 1px solid #e8dece; }
+    .cc-table tbody td {
+        background-color: var(--cc-cream);
+        color: var(--cc-ink);
+        padding: 11px 16px;
+        vertical-align: middle;
+    }
+    .cc-table tbody tr:hover td { background-color: var(--cc-linen); }
+
+    /* ─── Modal ─── */
+    .cc-modal-content {
+        background-color: var(--cc-cream);
+        border: 2px solid var(--cc-border);
+        border-radius: 18px;
+        color: var(--cc-ink);
+        box-shadow: 0 10px 40px rgba(90,60,30,0.2);
+        font-family: 'Lora', serif;
+    }
+    .cc-modal-header {
+        border-bottom: 1px solid var(--cc-border);
+        background: var(--cc-linen);
+        border-radius: 16px 16px 0 0;
+        padding: 16px 24px;
+    }
+    .cc-modal-footer {
+        border-top: 1px solid var(--cc-border);
+        padding: 14px 24px;
+    }
+    .cc-modal-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        font-style: italic;
+        color: var(--cc-bark);
+    }
+    .btn-close-cc {
+        filter: sepia(1) saturate(2) hue-rotate(10deg) brightness(0.6);
+        opacity: 0.6;
+    }
+    .btn-close-cc:hover { opacity: 1; }
+
+    /* ─── Spinner ─── */
+    .cc-spinner { color: var(--cc-moss) !important; }
+
+    /* ─── Empty state ─── */
+    .cc-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--cc-muted);
+        font-style: italic;
+        font-family: 'Lora', serif;
+    }
+</style>
+
+<div class="cc-wrapper">
+
+    <!-- Header -->
+    <div class="row mb-1">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 class="cc-title">🌿 Recetario de Categorías</h1>
+                    <p class="cc-subtitle">Organiza tus recetas con ternura y cuidado</p>
+                </div>
+                <button class="btn btn-cc-primary" @onclick="AbrirModalCrear">
+                    <span class="bi bi-plus-circle me-1"></span> Nueva Categoría
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cc-divider">🌸</div>
+
+    <!-- Alerts -->
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="cc-alert-error alert-dismissible fade show mb-3" role="alert">
+            <strong>🍂 Algo salió mal:</strong> @mensajeError
+            <button type="button" class="btn-close btn-close-cc float-end" @onclick="() => mensajeError = string.Empty"></button>
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeExito))
+    {
+        <div class="cc-alert-success alert-dismissible fade show mb-3" role="alert">
+            <strong>🌼 ¡Listo!</strong> @mensajeExito
+            <button type="button" class="btn-close btn-close-cc float-end" @onclick="() => mensajeExito = string.Empty"></button>
+        </div>
+    }
+
+    <!-- Search bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="cc-card p-3">
+                <div class="row g-3 align-items-center">
+                    <div class="col-12 col-md-7 col-lg-5">
+                        <div style="position:relative;">
+                            <span class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--cc-muted); font-size:0.85rem;"></span>
+                            <input type="text" class="form-control form-cc ps-4" placeholder="Busca entre tus categorías..."
+                                   @bind="busqueda" @bind:event="oninput" />
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-cc-outline" @onclick="LimpiarBusqueda">
+                            <span class="bi bi-x-circle me-1"></span> Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card grid -->
+    <div class="row">
+        @if (categorias == null)
+        {
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border cc-spinner" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p style="color:var(--cc-muted); font-style:italic; margin-top:14px; font-family:'Lora',serif;">
+                    Recogiendo ingredientes del jardín...
+                </p>
+            </div>
+        }
+        else if (!categorias.Any())
+        {
+            <div class="col-12">
+                <div class="cc-card">
+                    <div class="cc-empty">
+                        <div style="font-size:2.2rem;">🌱</div>
+                        <p class="mt-2 mb-0">El jardín está vacío.<br/>Planta tu primera categoría.</p>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var categoria in CategoriasFiltradas)
+            {
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="cc-card cc-category-card h-100">
+                        <div class="card-body d-flex flex-column p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0">@categoria.Nombre</h5>
+                                <div class="dropdown ms-2">
+                                    <button class="btn btn-sm btn-link p-0" type="button" style="color:var(--cc-muted);"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="bi bi-three-dots-vertical"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-cc">
+                                        <li>
+                                            <button class="dropdown-item" @onclick="() => AbrirModalEditar(categoria)">
+                                                <span class="bi bi-pencil me-2" style="color:var(--cc-sage);"></span>Editar
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <button class="dropdown-item" style="color:var(--cc-rose);" @onclick="() => EliminarCategoria(categoria.Id)">
+                                                <span class="bi bi-trash me-2"></span>Eliminar
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <p class="card-text flex-grow-1">
+                                @(string.IsNullOrEmpty(categoria.Descripcion) ? "Sin descripción aún..." : categoria.Descripcion)
+                            </p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2"
+                                 style="border-top: 1px dashed var(--cc-border);">
+                                <span class="cc-tag">🌿 categoría</span>
+                                <span class="cc-date-badge">
+                                    <span class="bi bi-calendar3 me-1"></span>@categoria.CreadoUtc.ToString("dd/MM/yyyy")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- List view -->
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="cc-card">
+                <div class="cc-card-header-strip d-flex align-items-center gap-2">
+                    <span style="font-size:1.1rem;">🕊️</span>
+                    <span class="cc-section-title">Vista de Lista</span>
+                </div>
+                <div class="card-body p-0" style="border-radius: 0 0 12px 12px; overflow: hidden;">
+                    <div class="table-responsive">
+                        <table class="table cc-table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">ID</th>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Fecha Creación</th>
+                                    <th class="text-end pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (categorias != null && categorias.Any())
+                                {
+                                    @foreach (var categoria in CategoriasFiltradas)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 text-muted" style="font-size:0.8rem;">@categoria.Id</td>
+                                            <td style="font-family:'Playfair Display',serif; font-weight:600; color:var(--cc-bark);">@categoria.Nombre</td>
+                                            <td style="color:var(--cc-muted); font-style:italic;">@(string.IsNullOrEmpty(categoria.Descripcion) ? "—" : categoria.Descripcion)</td>
+                                            <td style="color:var(--cc-muted); font-size:0.82rem;">@categoria.CreadoUtc.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td class="text-end pe-4">
+                                                <button class="btn btn-cc-ghost me-1" title="Editar"
+                                                        @onclick="() => AbrirModalEditar(categoria)">
+                                                    <span class="bi bi-pencil"></span>
+                                                </button>
+                                                <button class="btn btn-cc-danger" title="Eliminar"
+                                                        @onclick="() => EliminarCategoria(categoria.Id)">
+                                                    <span class="bi bi-trash"></span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4" style="color:var(--cc-muted); font-style:italic;">
+                                            No hay categorías para mostrar todavía 🍃
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+@if (mostrarModal)
+{
+    <div class="modal fade show d-block" tabindex="-1"
+         style="background-color: rgba(50, 35, 20, 0.55); backdrop-filter: blur(5px);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content cc-modal-content shadow-lg">
+                <div class="modal-header cc-modal-header">
+                    <h5 class="modal-title cc-modal-title">
+                        @(categoriaEditando == null ? "🌷 Nueva Categoría" : "✏️ Editar Categoría")
+                    </h5>
+                    <button type="button" class="btn-close btn-close-cc" @onclick="CerrarModal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label class="cc-label">Nombre <span style="color:var(--cc-rose);">*</span></label>
+                        <input type="text" class="form-control form-cc" @bind="nombreCategoria"
+                               placeholder="Ej: Mermeladas, Panes de campo, Sopas..." />
+                    </div>
+                    <div class="mb-2">
+                        <label class="cc-label">Descripción</label>
+                        <textarea class="form-control form-cc" rows="3" @bind="descripcionCategoria"
+                                  placeholder="Escribe algo sobre esta categoría..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer cc-modal-footer d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-cc-outline" @onclick="CerrarModal">Cancelar</button>
+                    <button type="button" class="btn btn-cc-primary px-4" @onclick="GuardarCategoria" disabled="@guardando">
+                        @if (guardando)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        }
+                        @(categoriaEditando == null ? "Crear" : "Guardar cambios")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<CategoriaDto>? categorias;
+    private string busqueda = "";
+    private bool mostrarModal = false;
+    private bool guardando = false;
+    private CategoriaDto? categoriaEditando = null;
+    private string nombreCategoria = "";
+    private string descripcionCategoria = "";
+    private string mensajeError = string.Empty;
+    private string mensajeExito = string.Empty;
+
+    private IEnumerable<CategoriaDto> CategoriasFiltradas
+    {
+        get
+        {
+            if (categorias == null) return Enumerable.Empty<CategoriaDto>();
+            if (string.IsNullOrWhiteSpace(busqueda))
+                return categorias;
+            return categorias.Where(c =>
+                c.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+                (c.Descripcion?.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ?? false)
+            );
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarCategorias();
+    }
+
+    private async Task CargarCategorias()
+    {
+        try
+        {
+            categorias = await categoriaService.ObtenerTodas();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al cargar categorías: {ex.Message}";
+            categorias = new List<CategoriaDto>();
+        }
+    }
+
+    private void AbrirModalCrear()
+    {
+        categoriaEditando = null;
+        nombreCategoria = "";
+        descripcionCategoria = "";
+        mensajeError = string.Empty;
+        mostrarModal = true;
+    }
+
+    private void AbrirModalEditar(CategoriaDto categoria)
+    {
+        categoriaEditando = categoria;
+        nombreCategoria = categoria.Nombre;
+        descripcionCategoria = categoria.Descripcion ?? "";
+        mensajeError = string.Empty;
+        mostrarModal = true;
+    }
+
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+        categoriaEditando = null;
+        nombreCategoria = "";
+        descripcionCategoria = "";
+        mensajeError = string.Empty;
+    }
+
+    private async Task GuardarCategoria()
+    {
+        if (string.IsNullOrWhiteSpace(nombreCategoria))
+        {
+            mensajeError = "El nombre es requerido";
+            return;
+        }
+
+        guardando = true;
+        mensajeError = string.Empty;
+        mensajeExito = string.Empty;
+
+        try
+        {
+            if (categoriaEditando == null)
+            {
+                var nuevaCategoria = new CategoriaCreacionDto
+                {
+                    Nombre = nombreCategoria,
+                    Descripcion = string.IsNullOrWhiteSpace(descripcionCategoria) ? null : descripcionCategoria
+                };
+                var resultado = await categoriaService.Crear(nuevaCategoria);
+                if (resultado != null)
+                {
+                    mensajeExito = "Categoría creada exitosamente";
+                    await CargarCategorias();
+                    CerrarModal();
+                }
+                else
+                {
+                    mensajeError = "No se pudo crear la categoría. Verifica que el nombre no esté duplicado.";
+                }
+            }
+            else
+            {
+                var categoriaModificacion = new CategoriaModificacionDto
+                {
+                    Nombre = nombreCategoria,
+                    Descripcion = string.IsNullOrWhiteSpace(descripcionCategoria) ? null : descripcionCategoria
+                };
+                var resultado = await categoriaService.Actualizar(categoriaEditando.Id, categoriaModificacion);
+                if (resultado)
+                {
+                    mensajeExito = "Categoría actualizada exitosamente";
+                    await CargarCategorias();
+                    CerrarModal();
+                }
+                else
+                {
+                    mensajeError = "No se pudo actualizar la categoría";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+
+    private async Task EliminarCategoria(int id)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar esta categoría?"))
+            return;
+
+        mensajeError = string.Empty;
+        mensajeExito = string.Empty;
+
+        try
+        {
+            var resultado = await categoriaService.Eliminar(id);
+            if (resultado)
+            {
+                mensajeExito = "Categoría eliminada exitosamente";
+                await CargarCategorias();
+            }
+            else
+            {
+                mensajeError = "No se pudo eliminar la categoría";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al eliminar: {ex.Message}";
+        }
+    }
+
+    private void LimpiarBusqueda()
+    {
+        busqueda = "";
+    }
+}
