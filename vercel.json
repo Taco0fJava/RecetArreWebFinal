@@ -1,0 +1,25 @@
+{
+  "outputDirectory": "RecetArreWeb/binReleasenet8.0publish/wwwroot",
+  "buildCommand": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/_framework/(.*)\\.wasm",
+      "headers": [{ "key": "Content-Type", "value": "application/wasm" }]
+    },
+    {
+      "source": "/_framework/(.*)\\.webcil",
+      "headers": [{ "key": "Content-Type", "value": "application/octet-stream" }]
+    },
+    {
+      "source": "/_framework/(.*)\\.gz",
+      "headers": [{ "key": "Content-Encoding", "value": "gzip" }]
+    },
+    {
+      "source": "/_framework/(.*)\\.br",
+      "headers": [{ "key": "Content-Encoding", "value": "br" }]
+    }
+  ]
+}
