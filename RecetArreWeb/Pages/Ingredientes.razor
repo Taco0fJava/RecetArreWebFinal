@@ -1,4 +1,4 @@
-@page "/ingredientes"
+﻿@page "/ingredientes"
 @attribute [Authorize]
 @inject IIngredienteService ingredienteService
 @inject IJSRuntime JSRuntime
@@ -6,7 +6,7 @@
 <PageTitle>Almacén de Ingredientes Mágicos uwu</PageTitle>
 
 <style>
-   /* @@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');*/
+   /* */
     /*Aqui se define el estilo de la página*/
     :root {
         --sage-green: #84a98c;
@@ -25,7 +25,7 @@
         background-image: radial-gradient(var(--sage-green) 0.5px, transparent 0.5px);
         background-size: 30px 30px;
         min-height: 100vh;
-        font-family: 'Lora', serif;
+        font-family: 'Open Sans', sans-serif;
         color: var(--text-dark);
     }
 
@@ -40,7 +40,7 @@
     }
 
     .title-cottage {
-        font-family: 'Playfair Display', serif;
+        font-family: 'Open Sans', sans-serif;
         font-style: italic;
         color: var(--deep-sage);
         font-weight: 700;
@@ -103,7 +103,7 @@
     }
 
     .table-cottage th {
-        font-family: 'Playfair Display', serif;
+        font-family: 'Open Sans', sans-serif;
         font-weight: 500;
         padding: 1rem;
     }
@@ -121,7 +121,7 @@
         background-color: var(--cream);
         border: 3px double var(--wheat);
         border-radius: var(--radius-organic);
-        font-family: 'Lora', serif;
+        font-family: 'Open Sans', sans-serif;
     }
 
     .modal-header-cottage {

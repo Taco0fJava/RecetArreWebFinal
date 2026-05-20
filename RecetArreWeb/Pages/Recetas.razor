@@ -1,4 +1,4 @@
-@page "/recetas"
+﻿@page "/recetas"
 @attribute [Authorize]
 @inject IRecetaService recetaService
 @inject ICategoriaService categoriaService
@@ -8,8 +8,7 @@
 <PageTitle>El Recetario de la Abuela | Cocina Creativa</PageTitle>
 
 <style>
-    @@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-
+    
     :root {
         --sage-green: #84a98c;
         --deep-sage: #52796f;
@@ -28,7 +27,7 @@
         background-image: radial-gradient(var(--sage-green) 0.5px, transparent 0.5px);
         background-size: 30px 30px; /* Sutil patrón de puntos rústico */
         min-height: 100vh;
-        font-family: 'Lora', serif;
+        font-family: 'Open Sans', sans-serif;
         color: var(--text-dark);
     }
 
@@ -46,7 +45,7 @@
     }
 
     .hero-title {
-        font-family: 'Playfair Display', serif;
+        font-family: 'Open Sans', sans-serif;
         font-style: italic;
         font-size: 3rem;
         margin-bottom: 0.5rem;
@@ -89,7 +88,7 @@
         border-radius: 10px;
         padding: 0.75rem 1rem;
         background: #fff;
-        font-family: 'Lora', serif;
+        font-family: 'Open Sans', sans-serif;
     }
 
     .form-control-cottage:focus {
@@ -148,7 +147,7 @@
     .recipe-content { padding: 1.5rem; }
 
     .recipe-title {
-        font-family: 'Playfair Display', serif;
+        font-family: 'Open Sans', sans-serif;
         font-weight: 700;
         color: var(--text-dark);
         font-size: 1.4rem;

@@ -1,4 +1,4 @@
-@page "/login"
+﻿@page "/login"
 @inject IAuthService authService
 @inject NavigationManager navigation
 @inject AuthenticationStateProvider authStateProvider
@@ -72,14 +72,13 @@
 </div>
 
 <style>
-    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
-
+    
     .cc-auth-page {
         min-height: 100vh;
         display: flex;
         align-items: center;
         padding: 2rem 0;
-        font-family: 'Lora', Georgia, serif;
+        font-family: 'Open Sans', sans-serif;
         background-color: #f5f0e8;
         background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8b898' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
@@ -104,7 +103,7 @@
     }
 
     .cc-auth-title {
-        font-family: 'Playfair Display', serif;
+        font-family: 'Open Sans', sans-serif;
         font-style: italic;
         font-size: 1.6rem;
         color: #e8d5b0;
@@ -132,7 +131,7 @@
         font-weight: 500;
         color: #7a5c3a;
         margin-bottom: 5px;
-        font-family: 'Lora', serif;
+        font-family: 'Open Sans', sans-serif;
     }
 
     .cc-input {
@@ -143,7 +142,7 @@
         border-radius: 10px;
         padding: 9px 14px;
         color: #3a2e22;
-        font-family: 'Lora', serif;
+        font-family: 'Open Sans', sans-serif;
         font-size: 0.9rem;
         transition: border-color 0.2s, box-shadow 0.2s;
     }
@@ -174,7 +173,7 @@
         border: none;
         border-radius: 30px;
         padding: 10px;
-        font-family: 'Lora', serif;
+        font-family: 'Open Sans', sans-serif;
         font-size: 0.95rem;
         font-weight: 500;
         display: flex;
@@ -230,7 +229,7 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1rem;
-        font-family: 'Lora', serif;
+        font-family: 'Open Sans', sans-serif;
     }
 
     .cc-alert-close {

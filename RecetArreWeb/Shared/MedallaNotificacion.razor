@@ -6,16 +6,16 @@
 @if (medallasNuevas.Count > 0)
 {
     <div class="medalla-toast-container">
-        @foreach (var medalla in medallasNuevas)
+        @foreach (var toast in medallasNuevas.ToList())
         {
-            <div class="medalla-toast @(medalla.visible ? "visible" : "")">
-                <div class="medalla-toast-icon">@medalla.Info.Icono</div>
+            <div class="medalla-toast @(toast.visible ? "visible" : "")">
+                <div class="medalla-toast-icon">@toast.Info.Icono</div>
                 <div class="medalla-toast-body">
                     <div class="medalla-toast-titulo">¡Logro desbloqueado!</div>
-                    <div class="medalla-toast-nombre">@medalla.Info.Nombre</div>
-                    <div class="medalla-toast-desc">@medalla.Info.Descripcion</div>
+                    <div class="medalla-toast-nombre">@toast.Info.Nombre</div>
+                    <div class="medalla-toast-desc">@toast.Info.Descripcion</div>
                 </div>
-                <button class="medalla-toast-close" @onclick="() => CerrarToast(medalla)">✕</button>
+                <button class="medalla-toast-close" @onclick="() => CerrarToast(toast)">✕</button>
             </div>
         }
     </div>
@@ -46,9 +46,9 @@
         box-shadow: 0 8px 30px rgba(0,0,0,0.3);
         pointer-events: all;
         opacity: 0;
-        transform: translateX(30px);
+        transform: translateX(40px);
         transition: opacity 0.4s ease, transform 0.4s ease;
-        font-family: 'Lora', Georgia, serif;
+        font-family: 'Open Sans', sans-serif;
     }
 
     .medalla-toast.visible {
@@ -62,25 +62,21 @@
         flex-shrink: 0;
     }
 
-    .medalla-toast-body {
-        flex: 1;
-    }
+    .medalla-toast-body { flex: 1; }
 
     .medalla-toast-titulo {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.1em;
         color: #8aab7a;
-        font-weight: 600;
+        font-weight: 700;
         margin-bottom: 2px;
     }
 
     .medalla-toast-nombre {
-        font-family: 'Playfair Display', serif;
-        font-size: 1rem;
-        font-style: italic;
+        font-size: 0.95rem;
         color: #e8d5b0;
-        font-weight: 600;
+        font-weight: 700;
     }
 
     .medalla-toast-desc {
@@ -92,15 +88,14 @@
     .medalla-toast-close {
         background: none;
         border: none;
-        color: rgba(245,240,232,0.5);
+        color: rgba(245,240,232,0.45);
         cursor: pointer;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         padding: 0;
         line-height: 1;
         flex-shrink: 0;
         transition: color 0.2s;
     }
-
     .medalla-toast-close:hover { color: #f5f0e8; }
 </style>
 
@@ -109,9 +104,14 @@
     private List<ToastItem> medallasNuevas = new();
     private bool verificando = false;
 
-    protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        navigation.LocationChanged += OnLocationChanged;
+        if (firstRender)
+        {
+            // Verificar al cargar la app por primera vez
+            await VerificarAsync();
+            navigation.LocationChanged += OnLocationChanged;
+        }
     }
 
     private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
@@ -130,20 +130,21 @@
         try
         {
             var resultado = await medallaService.VerificarMedallas();
-            if (resultado?.NuevasMedallas.Count > 0)
+            if (resultado?.NuevasMedallas?.Count > 0)
             {
                 foreach (var medalla in resultado.NuevasMedallas)
                 {
                     var toast = new ToastItem(medalla);
                     medallasNuevas.Add(toast);
                     await InvokeAsync(StateHasChanged);
-                    await Task.Delay(50);
+                    await Task.Delay(80);
                     toast.visible = true;
                     await InvokeAsync(StateHasChanged);
                     _ = AutoCerrarToast(toast);
                 }
             }
         }
+        catch { /* silencioso */ }
         finally
         {
             verificando = false;
@@ -152,8 +153,11 @@
 
     private async Task AutoCerrarToast(ToastItem toast)
     {
-        await Task.Delay(5000);
-        CerrarToast(toast);
+        await Task.Delay(5500);
+        toast.visible = false;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(400);
+        medallasNuevas.Remove(toast);
         await InvokeAsync(StateHasChanged);
     }
 
