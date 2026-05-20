@@ -1,4 +1,4 @@
-@@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+@@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
 /* ── Cottagecore Global Variables ── */
 :root {
@@ -12,7 +12,6 @@
     --cc-sage-pale:   #c8ddb8;
     --cc-forest:      #1e3a2f;
     --cc-forest-mid:  #2d5a46;
-    --cc-lavender:    #b8a8c8;
     --cc-rose:        #d4836a;
     --cc-rose-pale:   #e8c4b0;
     --cc-terracotta:  #c0664a;
@@ -20,22 +19,27 @@
     --cc-muted:       #8a7a68;
     --cc-border:      #c8b898;
     --cc-shadow:      rgba(90, 60, 30, 0.12);
+
+    /* Fuente base */
+    --font-base: 'Open Sans', sans-serif;
 }
 
 html, body {
-    font-family: 'Lora', Georgia, serif;
+    font-family: var(--font-base);
     background-color: var(--cc-parchment);
     color: var(--cc-ink);
 }
 
-h1:focus {
-    outline: none;
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-base);
+    font-weight: 700;
 }
+
+h1:focus { outline: none; }
 
 a {
     color: var(--cc-moss);
 }
-
 a:hover {
     color: var(--cc-bark);
 }
@@ -48,15 +52,14 @@ a:hover {
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid var(--cc-sage);
 }
-
 .invalid {
     outline: 1px solid var(--cc-terracotta);
 }
-
 .validation-message {
     color: var(--cc-terracotta);
     font-size: 0.8rem;
     font-style: italic;
+    font-family: var(--font-base);
 }
 
 /* ── Blazor Error UI ── */
@@ -72,9 +75,8 @@ a:hover {
     width: 100%;
     z-index: 1000;
     color: var(--cc-ink);
-    font-family: 'Lora', serif;
+    font-family: var(--font-base);
 }
-
 #blazor-error-ui .dismiss {
     cursor: pointer;
     position: absolute;
@@ -88,9 +90,8 @@ a:hover {
     padding: 1rem 1rem 1rem 2rem;
     color: #7a3822;
     border-radius: 10px;
-    font-family: 'Lora', serif;
+    font-family: var(--font-base);
 }
-
 .blazor-error-boundary::after {
     content: "Ha ocurrido un error.";
 }
@@ -103,7 +104,6 @@ a:hover {
     height: 8rem;
     margin: 20vh auto 1rem auto;
 }
-
 .loading-progress circle {
     fill: none;
     stroke: var(--cc-border);
@@ -111,22 +111,19 @@ a:hover {
     transform-origin: 50% 50%;
     transform: rotate(-90deg);
 }
-
 .loading-progress circle:last-child {
     stroke: var(--cc-moss);
     stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
     transition: stroke-dasharray 0.05s ease-in-out;
 }
-
 .loading-progress-text {
     position: absolute;
     text-align: center;
-    font-weight: bold;
+    font-weight: 600;
     inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-base);
     color: var(--cc-moss);
 }
-
 .loading-progress-text:after {
     content: var(--blazor-load-percentage-text, "Cargando...");
 }

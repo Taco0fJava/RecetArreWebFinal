@@ -68,7 +68,7 @@ main[b-rg6hjp3r2s] {
 }
 
 .cc-brand-name[b-8lk472ykml] {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Open Sans', sans-serif;
     font-style: italic;
     font-size: 1.15rem;
     font-weight: 600;
@@ -128,7 +128,7 @@ main[b-rg6hjp3r2s] {
 
 /* ── Section labels ── */
 .cc-nav-section-label[b-8lk472ykml] {
-    font-family: 'Lora', Georgia, serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.65rem;
     font-weight: 600;
     letter-spacing: 0.12em;
@@ -150,7 +150,7 @@ main[b-rg6hjp3r2s] {
     border-radius: 10px;
     color: rgba(245, 240, 232, 0.78);
     text-decoration: none;
-    font-family: 'Lora', Georgia, serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.88rem;
     transition: background 0.18s, color 0.18s;
     border: none;
@@ -192,7 +192,7 @@ main[b-rg6hjp3r2s] {
     gap: 0.6rem;
     padding: 0.5rem 0.75rem;
     color: rgba(200, 221, 184, 0.65);
-    font-family: 'Lora', Georgia, serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.82rem;
     font-style: italic;
 }

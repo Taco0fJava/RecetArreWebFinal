@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "RecetArreWeb",
   "resources": {
-    "hash": "sha256-1Fq6AOYypzZHF5NcY8dE5191tdb6wa1Dpxx4+pAgfbw=",
+    "hash": "sha256-8W4vXSlhnnokkorsKdceudr/nNg2DEdwCKbGoDn7ToI=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-sn/g61GjVPhViOYQDkq1OMlk0eyS9r2Hi0qgU2o0HIU="
     },
@@ -52,7 +52,7 @@
       "System.Console.wasm": "sha256-HIwXknkY69ZX29k1iFgZdtp0lOd5wJ28JmxVF+G7PVU=",
       "System.Diagnostics.DiagnosticSource.wasm": "sha256-hsD/m8MwnHvIMiBEsyVDUxIVWNkYatd5sIs9DT8fyUo=",
       "System.Linq.Expressions.wasm": "sha256-9WHit92z+BQNRd6IJv3yWEAt6cQYVGujrGD9qs1WnwY=",
-      "System.Linq.wasm": "sha256-nzNxTAYj1+CN2rFKrhnqr9Ad1Jh3vYjkMDzg4kflBv0=",
+      "System.Linq.wasm": "sha256-E2jhNsHvbIIZKC1fONx2M+or79OJUmRiZLX6TSpPsVE=",
       "System.Memory.wasm": "sha256-GGcJDeMmEjzp8028+LgAKeIhdAHQ1v/kUEPJ2yLVJSU=",
       "System.Net.Http.Json.wasm": "sha256-ELRtZSJLX3WSbLV1vAyLsVsRnvNlcw32dGKgRPdyyRU=",
       "System.Net.Http.wasm": "sha256-3aA8/2mkUyLyaBGRcHbOLrS1PnWSOrn3T2I66p03VEY=",
@@ -69,7 +69,7 @@
       "System.Text.RegularExpressions.wasm": "sha256-VKL9Y6lQeg23eExgGxJAoR8gP9DXxnp8+/Mfiki+8Io=",
       "System.wasm": "sha256-T4iprIGorUAo1X44AS78i81rjTVY995cbd5O+yc1VDY=",
       "System.Private.CoreLib.wasm": "sha256-n1QQbMpeRfmjpfcZzDh/r05hrznR6rz3nceTrRV4cMs=",
-      "RecetArreWeb.wasm": "sha256-U3eK7inSD3kLSPNNaDTqn6v49PIVvoZRJ54nZqE/FlI="
+      "RecetArreWeb.wasm": "sha256-t6LsrZ2o18SDxK1T9ZmNoABZ2XwtCXhHbcGd8ENzcmk="
     }
   },
   "cacheBootResources": true,
