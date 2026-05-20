@@ -3,79 +3,262 @@
 @inject NavigationManager navigation
 @inject AuthenticationStateProvider authStateProvider
 
-<PageTitle>Registro</PageTitle>
+<PageTitle>Crear Cuenta | RecetArre</PageTitle>
 
-<div class="login-page">
+<div class="cc-auth-page">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12 col-sm-10 col-md-7 col-lg-5">
-                <div class="card shadow border-0 login-card">
-                    <div class="card-body p-4">
-                        <div class="text-center mb-4">
-                            <div class="login-logo bg-brand text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                                <span class="fw-bold">RA</span>
-                            </div>
-                            <h2 class="h4 text-brand mb-1">Crear Cuenta</h2>
-                            <p class="text-muted mb-0">Regístrate para comenzar</p>
-                        </div>
 
+                <div class="cc-auth-card">
+                    <div class="cc-auth-header">
+                        <div class="cc-auth-logo">🌱</div>
+                        <h1 class="cc-auth-title">Crear Cuenta</h1>
+                        <p class="cc-auth-sub">Únete al recetario y comienza tu aventura culinaria</p>
+                    </div>
+
+                    <div class="cc-auth-body">
                         @if (!string.IsNullOrEmpty(mensajeError))
                         {
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <strong>Error:</strong> @mensajeError
-                                <button type="button" class="btn-close" @onclick="() => mensajeError = string.Empty"></button>
+                            <div class="cc-alert-error" role="alert">
+                                <span>⚠️ @mensajeError</span>
+                                <button type="button" class="cc-alert-close" @onclick="() => mensajeError = string.Empty">✕</button>
                             </div>
                         }
 
                         <EditForm Model="credenciales" OnValidSubmit="HandleRegistro">
                             <DataAnnotationsValidator />
 
-                            <div class="mb-3">
-                                <label class="form-label">Correo electrónico</label>
-                                <InputText @bind-Value="credenciales.Email" 
-                                           class="form-control" 
+                            <div class="cc-field">
+                                <label class="cc-label">Correo electrónico</label>
+                                <InputText @bind-Value="credenciales.Email"
+                                           class="cc-input"
                                            placeholder="nombre@correo.com" />
-                                <ValidationMessage For="@(() => credenciales.Email)" />
+                                <ValidationMessage For="@(() => credenciales.Email)" class="cc-validation" />
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Contraseña</label>
-                                <InputText type="password" 
-                                           @bind-Value="credenciales.Password" 
-                                           class="form-control" 
+                            <div class="cc-field">
+                                <label class="cc-label">Contraseña</label>
+                                <InputText type="password"
+                                           @bind-Value="credenciales.Password"
+                                           class="cc-input"
                                            placeholder="Mínimo 6 caracteres" />
-                                <ValidationMessage For="@(() => credenciales.Password)" />
+                                <ValidationMessage For="@(() => credenciales.Password)" class="cc-validation" />
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Confirmar Contraseña</label>
-                                <InputText type="password" 
-                                           @bind-Value="confirmarPassword" 
-                                           class="form-control" 
+                            <div class="cc-field">
+                                <label class="cc-label">Confirmar Contraseña</label>
+                                <InputText type="password"
+                                           @bind-Value="confirmarPassword"
+                                           class="cc-input"
                                            placeholder="Repite tu contraseña" />
                             </div>
 
-                            <button type="submit" class="btn btn-brand w-100" disabled="@cargando">
+                            <button type="submit" class="cc-btn-submit" disabled="@cargando">
                                 @if (cargando)
                                 {
                                     <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                else
+                                {
+                                    <span>🌱</span>
                                 }
                                 Registrarse
                             </button>
                         </EditForm>
 
-                        <div class="text-center mt-3">
-                            <span class="text-muted">¿Ya tienes cuenta?</span>
-                            <a class="link-brand fw-semibold ms-1" href="/login">Inicia sesión</a>
+                        <div class="cc-auth-footer">
+                            <span class="cc-auth-footer-text">¿Ya tienes cuenta?</span>
+                            <a class="cc-auth-link" href="/login">Inicia sesión</a>
                         </div>
                     </div>
                 </div>
 
-                <p class="text-center text-muted small mt-3 mb-0">Al registrarte aceptas nuestros términos y condiciones</p>
+                <p class="cc-auth-terms">Al registrarte aceptas nuestros términos y condiciones</p>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+
+    .cc-auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 2rem 0;
+        font-family: 'Lora', Georgia, serif;
+        background-color: #f5f0e8;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8b898' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .cc-auth-card {
+        background: #faf6ee;
+        border: 1.5px solid #c8b898;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(90, 60, 30, 0.12);
+        overflow: hidden;
+    }
+
+    .cc-auth-header {
+        background: linear-gradient(135deg, #1e3a2f 0%, #2d5a46 100%);
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .cc-auth-logo {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .cc-auth-title {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-size: 1.6rem;
+        color: #e8d5b0;
+        margin-bottom: 0.25rem;
+    }
+
+    .cc-auth-sub {
+        color: rgba(245, 240, 232, 0.65);
+        font-size: 0.88rem;
+        font-style: italic;
+        margin: 0;
+    }
+
+    .cc-auth-body {
+        padding: 1.75rem;
+    }
+
+    .cc-field {
+        margin-bottom: 1.1rem;
+    }
+
+    .cc-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #7a5c3a;
+        margin-bottom: 5px;
+        font-family: 'Lora', serif;
+    }
+
+    .cc-input {
+        display: block;
+        width: 100%;
+        background: #f5f0e8;
+        border: 1.5px solid #c8b898;
+        border-radius: 10px;
+        padding: 9px 14px;
+        color: #3a2e22;
+        font-family: 'Lora', serif;
+        font-size: 0.9rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .cc-input:focus {
+        outline: none;
+        border-color: #8aab7a;
+        box-shadow: 0 0 0 3px rgba(138, 171, 122, 0.2);
+    }
+
+    .cc-input::placeholder {
+        color: #a09080;
+        font-style: italic;
+    }
+
+    .cc-validation {
+        color: #b56576;
+        font-size: 0.78rem;
+        font-style: italic;
+        margin-top: 3px;
+        display: block;
+    }
+
+    .cc-btn-submit {
+        width: 100%;
+        background: #5a7a4a;
+        color: #f5f0e8;
+        border: none;
+        border-radius: 30px;
+        padding: 10px;
+        font-family: 'Lora', serif;
+        font-size: 0.95rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.15s;
+        box-shadow: 0 4px 12px rgba(90, 122, 74, 0.3);
+        margin-top: 0.5rem;
+    }
+
+    .cc-btn-submit:hover:not(:disabled) {
+        background: #3a2e22;
+        transform: translateY(-1px);
+    }
+
+    .cc-btn-submit:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+    .cc-auth-footer {
+        text-align: center;
+        margin-top: 1.2rem;
+        font-size: 0.88rem;
+    }
+
+    .cc-auth-footer-text {
+        color: #8a7a68;
+    }
+
+    .cc-auth-link {
+        color: #5a7a4a;
+        font-weight: 600;
+        text-decoration: none;
+        margin-left: 6px;
+    }
+
+    .cc-auth-link:hover {
+        color: #3a2e22;
+        text-decoration: underline;
+    }
+
+    .cc-alert-error {
+        background: #f9ece7;
+        color: #7a3822;
+        border: 1.5px solid #d4836a;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.88rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-family: 'Lora', serif;
+    }
+
+    .cc-alert-close {
+        background: none;
+        border: none;
+        color: #b56576;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+
+    .cc-auth-terms {
+        text-align: center;
+        color: #a09080;
+        font-size: 0.75rem;
+        font-style: italic;
+        margin-top: 1rem;
+        font-family: 'Lora', serif;
+    }
+</style>
 
 @code {
     private CredencialesUsuario credenciales = new();
@@ -97,15 +280,12 @@
         try
         {
             var respuesta = await authService.Registrar(credenciales);
-
-            // Notificar al AuthStateProvider y redirigir
             var authProvider = (AuthStateProvider)authStateProvider;
-            authProvider.NotificarLogin(respuesta.Token);
+            authProvider.NotificarLogin(respuesta!.Token);
             navigation.NavigateTo("/");
         }
         catch (Exception ex)
         {
-            // Muestra el mensaje real que devolvió la API (traducido al español)
             mensajeError = ex.Message;
         }
         finally

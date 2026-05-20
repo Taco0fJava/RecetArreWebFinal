@@ -1,45 +1,47 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">RecetArreWeb</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
+<div class="cc-sidebar-top">
+    <div class="cc-brand-row">
+        <span class="cc-brand-icon">🌿</span>
+        <a class="cc-brand-name" href="">RecetArre</a>
+        <button title="Navigation menu" class="cc-toggler" @onclick="ToggleNavMenu">
+            <span class="cc-toggler-icon"></span>
         </button>
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+<div class="@NavMenuCssClass cc-nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="cc-nav-flex">
+
+        <div class="cc-nav-section-label">Inicio</div>
+        <div class="cc-nav-item">
+            <NavLink class="cc-nav-link" href="" Match="NavLinkMatch.All">
+                <span class="cc-nav-icon">🏡</span> Inicio
             </NavLink>
         </div>
 
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="categorias">
-                        <span class="bi bi-grid-fill" aria-hidden="true"></span> Categorías
+                <div class="cc-nav-section-label">Recetario</div>
+                <div class="cc-nav-item">
+                    <NavLink class="cc-nav-link" href="recetas">
+                        <span class="cc-nav-icon">📖</span> Recetas
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="ingredientes">
-                        <span class="bi bi-basket" aria-hidden="true"></span> Ingredientes
+                <div class="cc-nav-item">
+                    <NavLink class="cc-nav-link" href="categorias">
+                        <span class="cc-nav-icon">🏷️</span> Categorías
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="recetas">
-                        <span class="bi bi-book" aria-hidden="true"></span> Recetas
+                <div class="cc-nav-item">
+                    <NavLink class="cc-nav-link" href="ingredientes">
+                        <span class="cc-nav-icon">🌾</span> Ingredientes
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="counter">
-                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="weather">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+
+                <div class="cc-nav-divider"></div>
+                <div class="cc-nav-section-label">Perfil</div>
+                <div class="cc-nav-item">
+                    <NavLink class="cc-nav-link" href="medallas">
+                        <span class="cc-nav-icon">🏅</span> Mis Medallas
                     </NavLink>
                 </div>
             </Authorized>
@@ -47,30 +49,34 @@
 
         <AuthorizeView>
             <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="login">
-                        <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Login
+                <div class="cc-nav-divider"></div>
+                <div class="cc-nav-item">
+                    <NavLink class="cc-nav-link" href="login">
+                        <span class="cc-nav-icon">🔑</span> Iniciar Sesión
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="registro">
-                        <span class="bi bi-person-plus" aria-hidden="true"></span> Registro
+                <div class="cc-nav-item">
+                    <NavLink class="cc-nav-link" href="registro">
+                        <span class="cc-nav-icon">🌱</span> Registrarse
                     </NavLink>
                 </div>
             </NotAuthorized>
             <Authorized>
-                <div class="nav-item px-3">
-                    <div class="nav-link text-muted small">
-                        <span class="bi bi-person-circle"></span> @context.User.Identity?.Name
+                <div class="cc-nav-divider"></div>
+                <div class="cc-nav-item">
+                    <div class="cc-user-info">
+                        <span class="cc-nav-icon">👤</span>
+                        <span class="cc-username">@context.User.Identity?.Name</span>
                     </div>
                 </div>
-                <div class="nav-item px-3">
-                    <button class="nav-link btn btn-link" @onclick="Logout">
-                        <span class="bi bi-box-arrow-left" aria-hidden="true"></span> Cerrar Sesión
+                <div class="cc-nav-item">
+                    <button class="cc-nav-link cc-logout-btn" @onclick="Logout">
+                        <span class="cc-nav-icon">🚪</span> Cerrar Sesión
                     </button>
                 </div>
             </Authorized>
         </AuthorizeView>
+
     </nav>
 </div>
 
@@ -96,10 +102,8 @@
     private async Task Logout()
     {
         await authService.Logout();
-        
         var authProvider = (AuthStateProvider)authStateProvider;
         authProvider.NotificarLogout();
-        
         navigation.NavigateTo("/login");
     }
 }

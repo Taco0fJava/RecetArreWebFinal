@@ -374,6 +374,58 @@
     input[type="number"].cc-input::-webkit-outer-spin-button {
         opacity: 0.4;
     }
+
+    /* ─── Ingredient search ─── */
+    .cc-search-wrap {
+        display: flex;
+        align-items: center;
+        background: var(--cc-parchment);
+        border: 1.5px solid var(--cc-border);
+        border-radius: 30px;
+        padding: 6px 12px;
+        gap: 6px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .cc-search-wrap:focus-within {
+        border-color: var(--cc-sage);
+        box-shadow: 0 0 0 3px rgba(138, 171, 122, 0.2);
+    }
+    .cc-search-icon {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .cc-search-input {
+        border: none;
+        background: transparent;
+        color: var(--cc-ink);
+        font-family: 'Lora', serif;
+        font-size: 0.88rem;
+        flex: 1;
+        outline: none;
+    }
+    .cc-search-input::placeholder {
+        color: var(--cc-muted);
+        font-style: italic;
+    }
+    .cc-search-clear {
+        background: none;
+        border: none;
+        color: var(--cc-muted);
+        cursor: pointer;
+        font-size: 0.75rem;
+        padding: 0 2px;
+        transition: color 0.2s;
+        flex-shrink: 0;
+    }
+    .cc-search-clear:hover {
+        color: var(--cc-bark);
+    }
+    .cc-no-results {
+        font-size: 0.82rem;
+        color: var(--cc-muted);
+        font-style: italic;
+        padding: 4px 8px;
+    }
 </style>
 
 <div class="cc-page">
@@ -484,8 +536,22 @@
                                     <div class="cc-section-divider">🌿</div>
                                     @if (ingredientes != null)
                                     {
+                                        <div class="mb-3">
+                                            <div class="cc-search-wrap">
+                                                <span class="cc-search-icon">🔍</span>
+                                                <input type="text"
+                                                       class="cc-search-input"
+                                                       placeholder="Buscar ingrediente..."
+                                                       @bind="busquedaIngrediente"
+                                                       @bind:event="oninput" />
+                                                @if (!string.IsNullOrEmpty(busquedaIngrediente))
+                                                {
+                                                    <button type="button" class="cc-search-clear" @onclick="() => busquedaIngrediente = string.Empty">✕</button>
+                                                }
+                                            </div>
+                                        </div>
                                         <div class="cc-chips">
-                                            @foreach (var ing in ingredientes)
+                                            @foreach (var ing in IngredientesFiltrados)
                                             {
                                                 <div class="cc-chip">
                                                     <input type="checkbox" id="ing-@ing.Id"
@@ -493,6 +559,10 @@
                                                            @onchange="e => ToggleIngrediente(ing.Id, (bool)(e.Value ?? false))" />
                                                     <label for="ing-@ing.Id">@ing.Nombre</label>
                                                 </div>
+                                            }
+                                            @if (!IngredientesFiltrados.Any())
+                                            {
+                                                <span class="cc-no-results">Sin resultados para "@busquedaIngrediente"</span>
                                             }
                                         </div>
                                     }
@@ -582,9 +652,16 @@
     private RecetaCreacionDto modelo = new();
     private List<CategoriaDto>? categorias;
     private List<IngredienteDto>? ingredientes;
+    private string busquedaIngrediente = string.Empty;
     private bool cargando = true;
     private bool guardando = false;
     private string mensajeError = string.Empty;
+
+    private IEnumerable<IngredienteDto> IngredientesFiltrados =>
+        string.IsNullOrWhiteSpace(busquedaIngrediente)
+            ? ingredientes ?? Enumerable.Empty<IngredienteDto>()
+            : (ingredientes ?? Enumerable.Empty<IngredienteDto>())
+                .Where(i => i.Nombre.Contains(busquedaIngrediente, StringComparison.OrdinalIgnoreCase));
 
     private void VolverARecetas() => navigation.NavigateTo("/recetas");
 

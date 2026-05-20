@@ -1,0 +1,216 @@
+@page "/medallas"
+@attribute [Authorize]
+@inject IMedallaService medallaService
+
+<PageTitle>Mis Medallas | RecetArre</PageTitle>
+
+<div class="cc-page">
+    <div class="cc-hero">
+        <div class="container">
+            <h1 class="cc-hero-title">🏅 Mis Medallas</h1>
+            <p class="cc-hero-sub">Tus logros culinarios conquistados</p>
+        </div>
+    </div>
+
+    <div class="container">
+        @if (cargando)
+        {
+            <div class="cc-loading">
+                <div class="spinner-border cc-spinner mb-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mb-0">Buscando tus logros en el jardín...</p>
+            </div>
+        }
+        else
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="cc-stats-bar">
+                        <span class="cc-stat">
+                            <strong>@medallas.Count(m => m.Obtenida)</strong> de <strong>@medallas.Count</strong> medallas obtenidas
+                        </span>
+                        <div class="cc-progress-wrap">
+                            <div class="cc-progress-bar" style="width: @(medallas.Count > 0 ? (medallas.Count(m => m.Obtenida) * 100 / medallas.Count) : 0)%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                @foreach (var medalla in medallas)
+                {
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="cc-medal-card @(medalla.Obtenida ? "obtenida" : "bloqueada")">
+                            <div class="cc-medal-icon">@medalla.Icono</div>
+                            <div class="cc-medal-nombre">@medalla.Nombre</div>
+                            <div class="cc-medal-desc">@medalla.Descripcion</div>
+                            @if (medalla.Obtenida && medalla.FechaObtencion.HasValue)
+                            {
+                                <div class="cc-medal-fecha">
+                                    Obtenida el @medalla.FechaObtencion.Value.ToLocalTime().ToString("dd MMM yyyy")
+                                </div>
+                            }
+                            else if (!medalla.Obtenida)
+                            {
+                                <div class="cc-medal-lock">🔒 Sin obtener</div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .cc-page {
+        background-color: var(--cc-parchment);
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8b898' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        min-height: 100vh;
+        padding-bottom: 3rem;
+        font-family: 'Lora', Georgia, serif;
+        color: var(--cc-ink);
+    }
+
+    .cc-hero {
+        background: linear-gradient(135deg, #1e3a2f 0%, #2d5a46 100%);
+        border-radius: 0 0 24px 24px;
+        padding: 2.2rem 0 2rem;
+        margin-bottom: 2rem;
+        color: var(--cc-parchment);
+    }
+
+    .cc-hero-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 600;
+        font-style: italic;
+        color: #e8d5b0;
+        margin-bottom: 4px;
+    }
+
+    .cc-hero-sub {
+        font-size: 0.9rem;
+        color: rgba(245, 240, 232, 0.65);
+        font-style: italic;
+        margin: 0;
+    }
+
+    .cc-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        background: #faf6ee;
+        border-radius: 14px;
+        border: 1.5px solid #c8b898;
+        color: #8a7a68;
+        font-style: italic;
+    }
+
+    .cc-spinner { color: #5a7a4a; }
+
+    .cc-stats-bar {
+        background: #faf6ee;
+        border: 1.5px solid #c8b898;
+        border-radius: 12px;
+        padding: 14px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 0.5rem;
+    }
+
+    .cc-stat {
+        font-size: 0.9rem;
+        color: #3a2e22;
+        font-family: 'Lora', serif;
+    }
+
+    .cc-progress-wrap {
+        background: #ede6d6;
+        border-radius: 8px;
+        height: 8px;
+        overflow: hidden;
+    }
+
+    .cc-progress-bar {
+        background: linear-gradient(90deg, #5a7a4a, #8aab7a);
+        height: 100%;
+        border-radius: 8px;
+        transition: width 0.6s ease;
+    }
+
+    .cc-medal-card {
+        background: #faf6ee;
+        border: 1.5px solid #c8b898;
+        border-radius: 16px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .cc-medal-card.obtenida {
+        border-color: #8aab7a;
+        background: linear-gradient(135deg, #f0f7ec, #faf6ee);
+        box-shadow: 0 4px 16px rgba(90, 122, 74, 0.15);
+    }
+
+    .cc-medal-card.obtenida:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(90, 122, 74, 0.22);
+    }
+
+    .cc-medal-card.bloqueada {
+        opacity: 0.55;
+        filter: grayscale(0.6);
+    }
+
+    .cc-medal-icon {
+        font-size: 2.8rem;
+        line-height: 1;
+    }
+
+    .cc-medal-nombre {
+        font-family: 'Playfair Display', serif;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #3a2e22;
+    }
+
+    .cc-medal-desc {
+        font-size: 0.82rem;
+        color: #8a7a68;
+        font-style: italic;
+    }
+
+    .cc-medal-fecha {
+        font-size: 0.75rem;
+        color: #5a7a4a;
+        font-weight: 500;
+    }
+
+    .cc-medal-lock {
+        font-size: 0.78rem;
+        color: #a0906e;
+        font-style: italic;
+    }
+</style>
+
+@code {
+    private List<MedallaInfoDto> medallas = new();
+    private bool cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        medallas = await medallaService.ObtenerMisMedallas();
+        cargando = false;
+    }
+}

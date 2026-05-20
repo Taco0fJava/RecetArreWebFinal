@@ -1,7 +1,211 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>RecetArre | Tu Recetario Digital</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="cc-home">
+    <div class="cc-home-hero">
+        <div class="cc-home-hero-deco">🌿</div>
+        <div class="container text-center py-5">
+            <div class="cc-home-leaf-top">✿</div>
+            <h1 class="cc-home-title">Bienvenido a RecetArre</h1>
+            <p class="cc-home-sub">Tu grimorio culinario personal — guarda, comparte y descubre recetas con alma.</p>
+            <div class="cc-home-actions mt-4">
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/recetas" class="cc-btn-primary">
+                            <span>📖</span> Ver mis recetas
+                        </a>
+                        <a href="/recetas/crear" class="cc-btn-secondary">
+                            <span>✨</span> Crear receta
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/login" class="cc-btn-primary">
+                            <span>🔑</span> Iniciar sesión
+                        </a>
+                        <a href="/registro" class="cc-btn-secondary">
+                            <span>🌱</span> Crear cuenta
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </div>
 
-Welcome to your new app.
+    <div class="container py-5">
+        <div class="row g-4 justify-content-center">
+            <div class="col-12 col-md-4">
+                <div class="cc-feature-card">
+                    <div class="cc-feature-icon">📖</div>
+                    <h3 class="cc-feature-title">Tu Recetario</h3>
+                    <p class="cc-feature-desc">Guarda todas tus recetas favoritas en un solo lugar, organizadas por categorías e ingredientes.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="cc-feature-card">
+                    <div class="cc-feature-icon">🏅</div>
+                    <h3 class="cc-feature-title">Logros y Medallas</h3>
+                    <p class="cc-feature-desc">Desbloquea medallas especiales mientras contribuyes con comentarios y recetas a la comunidad.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="cc-feature-card">
+                    <div class="cc-feature-icon">⭐</div>
+                    <h3 class="cc-feature-title">Califica y Comenta</h3>
+                    <p class="cc-feature-desc">Valora las recetas de otros y deja tu opinión. Tu voz hace crecer la comunidad.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+
+    :root {
+        --cc-parchment: #f5f0e8;
+        --cc-cream: #faf6ee;
+        --cc-linen: #ede6d6;
+        --cc-bark: #7a5c3a;
+        --cc-moss: #5a7a4a;
+        --cc-sage: #8aab7a;
+        --cc-sage-pale: #c8ddb8;
+        --cc-rose: #d4836a;
+        --cc-ink: #3a2e22;
+        --cc-muted: #8a7a68;
+        --cc-border: #c8b898;
+    }
+
+    .cc-home {
+        min-height: 100vh;
+        font-family: 'Lora', Georgia, serif;
+        color: var(--cc-ink);
+    }
+
+    .cc-home-hero {
+        background: linear-gradient(135deg, #1e3a2f 0%, #2d5a46 60%, #354f52 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 1rem 0;
+    }
+
+    .cc-home-hero-deco {
+        position: absolute;
+        right: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 8rem;
+        opacity: 0.07;
+        pointer-events: none;
+        line-height: 1;
+    }
+
+    .cc-home-leaf-top {
+        font-size: 1.5rem;
+        color: rgba(200, 221, 184, 0.6);
+        margin-bottom: 1rem;
+    }
+
+    .cc-home-title {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        color: #e8d5b0;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .cc-home-sub {
+        color: rgba(245, 240, 232, 0.75);
+        font-size: 1.05rem;
+        font-style: italic;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .cc-home-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .cc-btn-primary {
+        background: #5a7a4a;
+        color: #f5f0e8;
+        border: none;
+        border-radius: 30px;
+        padding: 0.75rem 1.75rem;
+        font-family: 'Lora', serif;
+        font-size: 0.95rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background 0.2s, transform 0.15s;
+        box-shadow: 0 4px 12px rgba(90, 122, 74, 0.35);
+    }
+
+    .cc-btn-primary:hover {
+        background: #3a2e22;
+        color: #f5f0e8;
+        transform: translateY(-2px);
+    }
+
+    .cc-btn-secondary {
+        background: transparent;
+        color: rgba(245, 240, 232, 0.85);
+        border: 1.5px solid rgba(138, 171, 122, 0.5);
+        border-radius: 30px;
+        padding: 0.75rem 1.75rem;
+        font-family: 'Lora', serif;
+        font-size: 0.95rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .cc-btn-secondary:hover {
+        border-color: #8aab7a;
+        color: #f5f0e8;
+        background: rgba(138, 171, 122, 0.1);
+    }
+
+    .cc-feature-card {
+        background: #faf6ee;
+        border: 1.5px solid #c8b898;
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+    }
+
+    .cc-feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(90, 60, 30, 0.12);
+    }
+
+    .cc-feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .cc-feature-title {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-size: 1.2rem;
+        color: #3a2e22;
+        margin-bottom: 0.75rem;
+    }
+
+    .cc-feature-desc {
+        color: #8a7a68;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+</style>
